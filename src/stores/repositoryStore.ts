@@ -10,6 +10,7 @@ import {
   setIncludeLocalStaleBranches,
   setLocalBaseBranch,
   setOrphanHorizon,
+  setSidebarWidths,
   syncRemoteOrigin,
 } from "../services/tauriGitClient";
 import {
@@ -31,6 +32,63 @@ export type TopologyFilterCategory =
 export type ColorThemeMode = "dark" | "light";
 
 const THEME_STORAGE_KEY = "quickgit_v0_theme_mode";
+const LEFT_SIDEBAR_WIDTH_STORAGE_KEY = "quickgit_v0_left_sidebar_width";
+const RIGHT_SIDEBAR_WIDTH_STORAGE_KEY = "quickgit_v0_right_sidebar_width";
+
+const DEFAULT_LEFT_SIDEBAR_WIDTH = 185;
+const DEFAULT_RIGHT_SIDEBAR_WIDTH = 205;
+
+function clampLeftSidebarWidth(width: number): number {
+  return Math.min(480, Math.max(185, Math.round(width)));
+}
+
+function clampRightSidebarWidth(width: number): number {
+  return Math.min(540, Math.max(205, Math.round(width)));
+}
+
+function resolveInitialLeftSidebarWidth(): number {
+  if (typeof window !== "undefined") {
+    try {
+      const raw = localStorage.getItem(LEFT_SIDEBAR_WIDTH_STORAGE_KEY);
+      const parsed = raw ? Number(raw) : NaN;
+      if (Number.isFinite(parsed) && parsed > 0) {
+        const clamped = clampLeftSidebarWidth(parsed);
+        document.documentElement.style.setProperty(
+          "--left-sidebar-width",
+          `${clamped}px`
+        );
+        return clamped;
+      }
+    } catch (_) {}
+    document.documentElement.style.setProperty(
+      "--left-sidebar-width",
+      `${DEFAULT_LEFT_SIDEBAR_WIDTH}px`
+    );
+  }
+  return DEFAULT_LEFT_SIDEBAR_WIDTH;
+}
+
+function resolveInitialRightSidebarWidth(): number {
+  if (typeof window !== "undefined") {
+    try {
+      const raw = localStorage.getItem(RIGHT_SIDEBAR_WIDTH_STORAGE_KEY);
+      const parsed = raw ? Number(raw) : NaN;
+      if (Number.isFinite(parsed) && parsed > 0) {
+        const clamped = clampRightSidebarWidth(parsed);
+        document.documentElement.style.setProperty(
+          "--right-sidebar-width",
+          `${clamped}px`
+        );
+        return clamped;
+      }
+    } catch (_) {}
+    document.documentElement.style.setProperty(
+      "--right-sidebar-width",
+      `${DEFAULT_RIGHT_SIDEBAR_WIDTH}px`
+    );
+  }
+  return DEFAULT_RIGHT_SIDEBAR_WIDTH;
+}
 
 function resolveInitialTheme(): ColorThemeMode {
   if (typeof window !== "undefined") {
@@ -150,8 +208,8 @@ export const useRepositoryStore = create<RepositoryStoreState>((set, get) => ({
   errorMessage: null,
   lastCheckoutOutcome: null,
   theme: resolveInitialTheme(),
-  leftSidebarWidth: 295,
-  rightSidebarWidth: 375,
+  leftSidebarWidth: resolveInitialLeftSidebarWidth(),
+  rightSidebarWidth: resolveInitialRightSidebarWidth(),
 
   initializeWorkspace: async () => {
     const currentTheme = get().theme;
@@ -161,7 +219,37 @@ export const useRepositoryStore = create<RepositoryStoreState>((set, get) => ({
     set({ isLoading: true, errorMessage: null });
     try {
       const meta = await loadWorkspaceMetadata();
-      set({ workspaceMeta: meta });
+      const restoredLeft = meta.leftSidebarWidth
+        ? clampLeftSidebarWidth(meta.leftSidebarWidth)
+        : get().leftSidebarWidth;
+      const restoredRight = meta.rightSidebarWidth
+        ? clampRightSidebarWidth(meta.rightSidebarWidth)
+        : get().rightSidebarWidth;
+      if (typeof document !== "undefined") {
+        document.documentElement.style.setProperty(
+          "--left-sidebar-width",
+          `${restoredLeft}px`
+        );
+        document.documentElement.style.setProperty(
+          "--right-sidebar-width",
+          `${restoredRight}px`
+        );
+      }
+      try {
+        localStorage.setItem(
+          LEFT_SIDEBAR_WIDTH_STORAGE_KEY,
+          String(restoredLeft)
+        );
+        localStorage.setItem(
+          RIGHT_SIDEBAR_WIDTH_STORAGE_KEY,
+          String(restoredRight)
+        );
+      } catch (_) {}
+      set({
+        workspaceMeta: meta,
+        leftSidebarWidth: restoredLeft,
+        rightSidebarWidth: restoredRight,
+      });
       const initialPath =
         meta.activeRepositoryPath ?? meta.recentRepositories[0] ?? null;
       if (initialPath) {
@@ -480,24 +568,36 @@ export const useRepositoryStore = create<RepositoryStoreState>((set, get) => ({
   },
 
   setLeftSidebarWidth: (width: number) => {
-    const clamped = Math.min(480, Math.max(220, Math.round(width)));
+    const clamped = clampLeftSidebarWidth(width);
     if (typeof document !== "undefined") {
       document.documentElement.style.setProperty(
         "--left-sidebar-width",
         `${clamped}px`
       );
     }
+    try {
+      localStorage.setItem(LEFT_SIDEBAR_WIDTH_STORAGE_KEY, String(clamped));
+    } catch (_) {}
     set({ leftSidebarWidth: clamped });
+    void setSidebarWidths(clamped, get().rightSidebarWidth).then((meta) => {
+      set({ workspaceMeta: meta });
+    });
   },
 
   setRightSidebarWidth: (width: number) => {
-    const clamped = Math.min(540, Math.max(260, Math.round(width)));
+    const clamped = clampRightSidebarWidth(width);
     if (typeof document !== "undefined") {
       document.documentElement.style.setProperty(
         "--right-sidebar-width",
         `${clamped}px`
       );
     }
+    try {
+      localStorage.setItem(RIGHT_SIDEBAR_WIDTH_STORAGE_KEY, String(clamped));
+    } catch (_) {}
     set({ rightSidebarWidth: clamped });
+    void setSidebarWidths(get().leftSidebarWidth, clamped).then((meta) => {
+      set({ workspaceMeta: meta });
+    });
   },
 }));

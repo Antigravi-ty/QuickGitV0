@@ -48,18 +48,35 @@ pub fn query_remote_origin_heads(
     fetch_objects: bool,
 ) -> Result<HashMap<String, String>, String> {
     if fetch_objects {
-        let _ = run_git_command(
+        let fetch_all = run_git_command(
             repo_path,
             &[
                 "-c",
                 "http.lowSpeedLimit=1000",
                 "-c",
-                "http.lowSpeedTime=8",
+                "http.lowSpeedTime=15",
                 "fetch",
                 "origin",
+                "+refs/heads/*:refs/remotes/origin/*",
+                "--tags",
                 "--no-prune",
             ],
         );
+        if fetch_all.is_err() {
+            let _ = run_git_command(
+                repo_path,
+                &[
+                    "-c",
+                    "http.lowSpeedLimit=1000",
+                    "-c",
+                    "http.lowSpeedTime=15",
+                    "fetch",
+                    "origin",
+                    "+refs/heads/*:refs/remotes/origin/*",
+                    "--no-prune",
+                ],
+            );
+        }
     }
 
     let raw = run_git_command(
@@ -68,7 +85,7 @@ pub fn query_remote_origin_heads(
             "-c",
             "http.lowSpeedLimit=1000",
             "-c",
-            "http.lowSpeedTime=6",
+            "http.lowSpeedTime=8",
             "ls-remote",
             "--heads",
             "--tags",
@@ -237,7 +254,7 @@ pub fn scan_repository(
     raw_repo_path: &str,
     cached_remote_refs: Option<&HashMap<String, String>>,
     last_sync_timestamp: Option<i64>,
-) -> Result<(RepositorySnapshot, Option<(HashMap<String, String>, i64)>), String> {
+) -> Result<RepositorySnapshot, String> {
     let repo_path = Path::new(raw_repo_path.trim());
     if !repo_path.exists() {
         return Err(format!("Repository path does not exist: {}", raw_repo_path));
@@ -262,34 +279,22 @@ pub fn scan_repository(
         .filter(|s| !s.is_empty());
     let is_detached_head = symbolic_head.is_none();
 
-    let mut fresh_remote_sync: Option<(HashMap<String, String>, i64)> = None;
-    let active_remote_map: Option<HashMap<String, String>> = match cached_remote_refs {
-        Some(existing) if !existing.is_empty() => Some(existing.clone()),
-        _ => match query_remote_origin_heads(canonical_path, false) {
-            Ok(fetched) => {
-                let now = std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .map(|d| d.as_secs() as i64)
-                    .unwrap_or(0);
-                fresh_remote_sync = Some((fetched.clone(), now));
-                Some(fetched)
-            }
-            Err(_) => None,
-        },
-    };
+    let active_remote_map: Option<HashMap<String, String>> =
+        cached_remote_refs.filter(|m| !m.is_empty()).cloned();
 
     let remote_sync_available = active_remote_map.is_some();
-    let effective_sync_ts = fresh_remote_sync
-        .as_ref()
-        .map(|(_, ts)| *ts)
-        .or(last_sync_timestamp);
+    let effective_sync_ts = if remote_sync_available {
+        last_sync_timestamp
+    } else {
+        None
+    };
 
     let refs_raw = run_git_command(
         canonical_path,
         &[
             "for-each-ref",
             "--sort=-committerdate",
-            "--format=%(refname)\x1f%(refname:short)\x1f%(objectname)\x1f%(committerdate:unix)\x1f%(subject)",
+            "--format=%(refname)\x1f%(refname:short)\x1f%(objectname)\x1f%(*objectname)\x1f%(committerdate:unix)\x1f%(subject)",
             "refs/heads",
             "refs/remotes",
             "refs/tags",
@@ -301,7 +306,7 @@ pub fn scan_repository(
 
     for line in refs_raw.lines() {
         let fields: Vec<&str> = line.split('\x1f').collect();
-        if fields.len() < 5 {
+        if fields.len() < 6 {
             continue;
         }
         let full_ref = fields[0].trim();
@@ -309,9 +314,14 @@ pub fn scan_repository(
         if full_ref.ends_with("/HEAD") || short_name == "origin" {
             continue;
         }
-        let commit_sha = fields[2].trim().to_string();
-        let timestamp = fields[3].trim().parse::<i64>().unwrap_or(0);
-        let subject = fields[4].trim().to_string();
+        let peeled_sha = fields[3].trim();
+        let commit_sha = if !peeled_sha.is_empty() {
+            peeled_sha.to_string()
+        } else {
+            fields[2].trim().to_string()
+        };
+        let timestamp = fields[4].trim().parse::<i64>().unwrap_or(0);
+        let subject = fields[5].trim().to_string();
         let is_remote = full_ref.starts_with("refs/remotes/");
         let is_tag = full_ref.starts_with("refs/tags/");
         let is_local = full_ref.starts_with("refs/heads/");
@@ -324,7 +334,7 @@ pub fn scan_repository(
 
         let is_on_remote_origin = match &active_remote_map {
             Some(live_map) => live_map.contains_key(&canonical_name),
-            None => is_remote,
+            None => true,
         };
 
         if let Some(existing) = branch_by_canonical.get_mut(&canonical_name) {
@@ -333,6 +343,8 @@ pub fn scan_repository(
             }
             if is_remote {
                 existing.is_remote = true;
+            }
+            if timestamp > existing.timestamp || (timestamp == existing.timestamp && is_remote) {
                 existing.name = short_name.to_string();
                 existing.full_ref = full_ref.to_string();
                 existing.commit_sha = commit_sha;
@@ -536,22 +548,19 @@ pub fn scan_repository(
 
     let working_tree_status = inspect_working_tree_guard(canonical_path, &submodules);
 
-    Ok((
-        RepositorySnapshot {
-            repo_path: canonical_path.to_string_lossy().to_string(),
-            repo_name,
-            head_sha,
-            head_ref_name: symbolic_head,
-            is_detached_head,
-            remote_sync_available,
-            last_remote_sync_timestamp: effective_sync_ts,
-            branches,
-            submodules,
-            commits,
-            working_tree_status,
-        },
-        fresh_remote_sync,
-    ))
+    Ok(RepositorySnapshot {
+        repo_path: canonical_path.to_string_lossy().to_string(),
+        repo_name,
+        head_sha,
+        head_ref_name: symbolic_head,
+        is_detached_head,
+        remote_sync_available,
+        last_remote_sync_timestamp: effective_sync_ts,
+        branches,
+        submodules,
+        commits,
+        working_tree_status,
+    })
 }
 
 pub fn checkout_detached_with_submodules(

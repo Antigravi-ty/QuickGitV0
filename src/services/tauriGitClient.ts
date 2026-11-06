@@ -134,6 +134,23 @@ export async function syncRemoteOrigin(
   };
 }
 
+export async function setSidebarWidths(
+  leftSidebarWidth: number,
+  rightSidebarWidth: number
+): Promise<AppWorkspaceMetadata> {
+  if (isTauriDesktopRuntime()) {
+    return invoke<AppWorkspaceMetadata>("set_sidebar_widths_cmd", {
+      leftSidebarWidth: Math.round(leftSidebarWidth),
+      rightSidebarWidth: Math.round(rightSidebarWidth),
+    });
+  }
+  const meta = loadBrowserFallbackMetadata();
+  meta.leftSidebarWidth = Math.round(leftSidebarWidth);
+  meta.rightSidebarWidth = Math.round(rightSidebarWidth);
+  saveBrowserFallbackMetadata(meta);
+  return meta;
+}
+
 export async function setLocalBaseBranch(
   repoPath: string,
   baseRef: string | null

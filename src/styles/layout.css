@@ -52,9 +52,9 @@
 
 .primer-sidebar {
   position: relative;
-  width: var(--left-sidebar-width, 270px);
-  min-width: 200px;
-  max-width: 520px;
+  width: var(--left-sidebar-width, 185px);
+  min-width: 170px;
+  max-width: 480px;
   flex-shrink: 0;
   background-color: var(--bg-canvas-subtle);
   border-right: 1px solid var(--border-default);
@@ -92,9 +92,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
   font-weight: 600;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 .primer-box-body {
@@ -131,9 +133,9 @@
 
 .primer-right-sidebar {
   position: relative;
-  width: var(--right-sidebar-width, 340px);
-  min-width: 220px;
-  max-width: 560px;
+  width: var(--right-sidebar-width, 205px);
+  min-width: 190px;
+  max-width: 540px;
   flex-shrink: 0;
   height: 100%;
   min-height: 0;

@@ -2,11 +2,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 5px 12px;
-  font-size: 12px;
+  gap: 5px;
+  padding: 5px 10px;
+  font-size: 11.5px;
   font-weight: 500;
-  line-height: 18px;
+  line-height: 16px;
   color: var(--fg-default);
   background-color: var(--btn-bg);
   border: 1px solid var(--border-default);
@@ -14,6 +14,22 @@
   cursor: pointer;
   transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
   white-space: nowrap;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.primer-btn svg {
+  flex-shrink: 0;
+}
+
+.primer-sidebar .primer-btn,
+.primer-right-sidebar .primer-btn {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  text-align: center;
+  line-height: 1.35;
+  height: auto;
 }
 
 .primer-btn:hover:not(:disabled) {
@@ -27,10 +43,12 @@
 
 .primer-btn-icon-only {
   padding: 5px 7px;
+  flex-shrink: 0;
 }
 
 .primer-card-action-btn {
   padding: var(--card-btn-padding);
+  font-size: 11px;
 }
 
 .primer-btn-primary {
@@ -506,13 +524,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
   padding: 6px 10px;
   background-color: var(--bg-canvas-subtle);
   border: 1px solid var(--border-default);
   border-radius: 6px;
   color: var(--fg-default);
   text-align: left;
+  min-width: 0;
+  max-width: 100%;
   transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 

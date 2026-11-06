@@ -121,5 +121,9 @@ pub struct RepositoryLocalMetadata {
 pub struct AppWorkspaceMetadata {
     pub recent_repositories: Vec<String>,
     pub active_repository_path: Option<String>,
+    #[serde(default)]
+    pub left_sidebar_width: Option<u32>,
+    #[serde(default)]
+    pub right_sidebar_width: Option<u32>,
     pub repositories: HashMap<String, RepositoryLocalMetadata>,
 }

@@ -16,7 +16,7 @@ use commands::git_commands::{
     open_app_config_dir_cmd, open_directory_in_os_cmd, pick_repository_directory_cmd,
     remove_recent_repository_cmd, save_commit_annotation_cmd,
     set_include_local_stale_branches_cmd, set_local_base_branch_cmd, set_orphan_horizon_cmd,
-    sync_remote_origin_cmd,
+    set_sidebar_widths_cmd, sync_remote_origin_cmd,
 };
 
 pub fn run() {
@@ -27,6 +27,7 @@ pub fn run() {
             pick_repository_directory_cmd,
             inspect_repository_cmd,
             sync_remote_origin_cmd,
+            set_sidebar_widths_cmd,
             set_local_base_branch_cmd,
             set_orphan_horizon_cmd,
             set_include_local_stale_branches_cmd,

@@ -98,24 +98,41 @@ export const LeftBranchSidebar: React.FC = () => {
         flexDirection: "column",
         height: "100%",
         overflowY: "auto",
-        padding: "10px 10px 16px 10px",
-        gap: 12,
+        overflowX: "hidden",
+        padding: "8px 8px 14px 8px",
+        gap: 10,
       }}
     >
       {/* Saved Workspace Repositories */}
       <div className="primer-box">
         <div
           className="primer-box-header"
-          style={{ padding: "7px 10px", fontSize: 11.5 }}
+          style={{ padding: "7px 8px", fontSize: 11.5 }}
         >
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <FolderOpen size={13} />
-            <span>Workspace Space ({workspaceMeta.recentRepositories.length})</span>
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 5,
+              minWidth: 0,
+            }}
+          >
+            <FolderOpen size={13} style={{ flexShrink: 0 }} />
+            <span>Workspace ({workspaceMeta.recentRepositories.length})</span>
           </span>
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: 4,
+              width: "100%",
+            }}
+          >
             <button
               type="button"
               className="primer-btn primer-card-action-btn"
+              style={{ flex: "1 1 70px" }}
               onClick={() => void selectAndLoadRepositoryFolder()}
               title="Select and save a repository folder into workspace"
             >
@@ -125,10 +142,11 @@ export const LeftBranchSidebar: React.FC = () => {
             <button
               type="button"
               className="primer-btn primer-card-action-btn"
+              style={{ flex: "1 1 82px" }}
               onClick={() => void openAppConfigDirectory()}
               title="Open local metadata storage directory"
             >
-              Config Dir
+              <span>Config Dir</span>
             </button>
           </div>
         </div>
@@ -152,6 +170,7 @@ export const LeftBranchSidebar: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   gap: 4,
+                  minWidth: 0,
                 }}
               >
                 <button
@@ -170,6 +189,7 @@ export const LeftBranchSidebar: React.FC = () => {
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
+                      minWidth: 0,
                     }}
                   >
                     {shortName}
@@ -201,12 +221,17 @@ export const LeftBranchSidebar: React.FC = () => {
         <div className="primer-box">
           <div
             className="primer-box-header"
-            style={{ padding: "7px 10px", fontSize: 11.5 }}
+            style={{ padding: "7px 8px", fontSize: 11.5 }}
           >
             <span
-              style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                minWidth: 0,
+              }}
             >
-              <Box size={13} />
+              <Box size={13} style={{ flexShrink: 0 }} />
               <span>Submodules ({snapshot.submodules.length})</span>
             </span>
             {focusedSubmodulePath && (
@@ -245,14 +270,16 @@ export const LeftBranchSidebar: React.FC = () => {
                     display: "flex",
                     flexDirection: "column",
                     gap: 5,
+                    minWidth: 0,
                   }}
                 >
                   <div
                     style={{
                       display: "flex",
+                      flexWrap: "wrap",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      gap: 6,
+                      gap: 4,
                     }}
                   >
                     <span
@@ -260,6 +287,7 @@ export const LeftBranchSidebar: React.FC = () => {
                         fontWeight: 600,
                         fontSize: 11.5,
                         fontFamily: "var(--font-mono-stack)",
+                        wordBreak: "break-all",
                       }}
                     >
                       {sub.path}
@@ -288,14 +316,19 @@ export const LeftBranchSidebar: React.FC = () => {
                     {sub.url}
                   </div>
                   <div
-                    style={{ display: "flex", alignItems: "center", gap: 5 }}
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "stretch",
+                      gap: 5,
+                    }}
                   >
                     <button
                       type="button"
                       className={`primer-btn primer-card-action-btn ${
                         isFocused ? "primer-btn-status-accent" : ""
                       }`}
-                      style={{ flex: 1 }}
+                      style={{ flex: "1 1 105px" }}
                       onClick={() =>
                         setFocusedSubmodulePath(isFocused ? null : sub.path)
                       }
@@ -305,7 +338,7 @@ export const LeftBranchSidebar: React.FC = () => {
                     <button
                       type="button"
                       className="primer-btn primer-card-action-btn"
-                      style={{ flex: 1 }}
+                      style={{ flex: "1 1 105px" }}
                       onClick={() =>
                         void loadRepositoryByPath(
                           resolveSubmoduleRepoPath(sub.path),
@@ -329,7 +362,7 @@ export const LeftBranchSidebar: React.FC = () => {
       <div className="primer-box">
         <div
           className="primer-box-header"
-          style={{ padding: "7px 10px", fontSize: 11.5 }}
+          style={{ padding: "7px 8px", fontSize: 11.5 }}
         >
           <span>Orphan Tree Horizon</span>
           <span className="primer-label primer-label-neutral">
@@ -348,12 +381,13 @@ export const LeftBranchSidebar: React.FC = () => {
           <div
             style={{
               display: "flex",
+              flexWrap: "wrap",
               alignItems: "center",
               justifyContent: "space-between",
-              gap: 8,
+              gap: 6,
             }}
           >
-            <span style={{ fontSize: 11.5, color: "var(--fg-muted)" }}>
+            <span style={{ fontSize: 11, color: "var(--fg-muted)" }}>
               Recent commit threshold:
             </span>
             <input
@@ -362,8 +396,8 @@ export const LeftBranchSidebar: React.FC = () => {
               max={100}
               className="primer-input"
               style={{
-                width: 64,
-                padding: "3px 6px",
+                width: 58,
+                padding: "3px 5px",
                 fontSize: 11.5,
                 textAlign: "center",
               }}
@@ -377,7 +411,7 @@ export const LeftBranchSidebar: React.FC = () => {
             />
           </div>
           <div
-            style={{ fontSize: 11, color: "var(--fg-muted)", lineHeight: 1.4 }}
+            style={{ fontSize: 10.5, color: "var(--fg-muted)", lineHeight: 1.4 }}
           >
             When the newest orphan tree has &lt; {horizonLimit} commits, the
             previous orphan tree stays visible. Once &gt;= {horizonLimit}{" "}
@@ -386,9 +420,10 @@ export const LeftBranchSidebar: React.FC = () => {
           {layout.hiddenOrphanTreeCount > 0 && (
             <button
               type="button"
-              className={`primer-btn ${
+              className={`primer-btn primer-card-action-btn ${
                 showArchived ? "primer-btn-status-attention" : ""
               }`}
+              style={{ width: "100%" }}
               onClick={() =>
                 void updateOrphanHorizon(horizonLimit, !showArchived)
               }
@@ -404,9 +439,10 @@ export const LeftBranchSidebar: React.FC = () => {
           {totalStaleBranchCount > 0 && (
             <button
               type="button"
-              className={`primer-btn ${
+              className={`primer-btn primer-card-action-btn ${
                 includeLocalStale ? "primer-btn-status-accent" : ""
               }`}
+              style={{ width: "100%" }}
               onClick={() =>
                 void updateIncludeLocalStaleBranches(!includeLocalStale)
               }
@@ -439,15 +475,25 @@ export const LeftBranchSidebar: React.FC = () => {
       >
         <div
           className="primer-box-header"
-          style={{ padding: "7px 10px", fontSize: 11.5 }}
+          style={{ padding: "7px 8px", fontSize: 11.5 }}
         >
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <GitBranch size={13} />
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 5,
+              minWidth: 0,
+            }}
+          >
+            <GitBranch size={13} style={{ flexShrink: 0 }} />
             <span>
-              Origin Branches ({totalCloudBranchCount})
-              {totalStaleBranchCount > 0
-                ? ` + ${totalStaleBranchCount} Local`
-                : ""}
+              {snapshot.remoteSyncAvailable
+                ? `Origin Branches (${totalCloudBranchCount})${
+                    totalStaleBranchCount > 0
+                      ? ` + ${totalStaleBranchCount} Local`
+                      : ""
+                  }`
+                : `Local Branches (${layout.branchSummaries.length})`}
             </span>
           </span>
           <span className="primer-label primer-label-attention">
@@ -463,14 +509,17 @@ export const LeftBranchSidebar: React.FC = () => {
             gap: 8,
             flex: 1,
             overflowY: "auto",
+            overflowX: "hidden",
           }}
         >
           {snapshot.lastRemoteSyncTimestamp && (
             <div
               style={{
                 display: "flex",
+                flexWrap: "wrap",
                 alignItems: "center",
                 justifyContent: "space-between",
+                gap: 4,
                 fontSize: 10.5,
                 color: "var(--fg-muted)",
                 padding: "2px 4px",

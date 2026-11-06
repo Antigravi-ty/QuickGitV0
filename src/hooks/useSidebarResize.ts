@@ -2,6 +2,11 @@ import React, { useCallback, useEffect, useRef } from "react";
 
 export type SidebarResizeDirection = "left" | "right";
 
+export const MIN_LEFT_SIDEBAR_WIDTH = 185;
+export const MAX_LEFT_SIDEBAR_WIDTH = 480;
+export const MIN_RIGHT_SIDEBAR_WIDTH = 205;
+export const MAX_RIGHT_SIDEBAR_WIDTH = 540;
+
 export function useSidebarResize(
   direction: SidebarResizeDirection,
   currentWidth: number,
@@ -16,9 +21,15 @@ export function useSidebarResize(
   const clampWidth = useCallback(
     (rawWidth: number): number => {
       if (direction === "left") {
-        return Math.min(480, Math.max(220, Math.round(rawWidth)));
+        return Math.min(
+          MAX_LEFT_SIDEBAR_WIDTH,
+          Math.max(MIN_LEFT_SIDEBAR_WIDTH, Math.round(rawWidth))
+        );
       }
-      return Math.min(540, Math.max(260, Math.round(rawWidth)));
+      return Math.min(
+        MAX_RIGHT_SIDEBAR_WIDTH,
+        Math.max(MIN_RIGHT_SIDEBAR_WIDTH, Math.round(rawWidth))
+      );
     },
     [direction]
   );

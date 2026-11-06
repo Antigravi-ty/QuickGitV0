@@ -72,12 +72,12 @@
   --editor-font-size: 12px;
   --gfm-font-size: 14px;
   --gfm-scale: 100%;
-  --left-sidebar-width: 270px;
-  --right-sidebar-width: 340px;
+  --left-sidebar-width: 185px;
+  --right-sidebar-width: 205px;
   --header-btn-padding: 6px 14px;
   --header-btn-icon-padding: 6px 9px;
   --header-btn-font-size: 13px;
-  --card-btn-padding: 5px 8px;
+  --card-btn-padding: 4px 7px;
 }
 
 [data-button-size="compact"] {

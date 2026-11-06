@@ -102,6 +102,8 @@ export interface RepositoryLocalMetadata {
 export interface AppWorkspaceMetadata {
   recentRepositories: string[];
   activeRepositoryPath: string | null;
+  leftSidebarWidth?: number;
+  rightSidebarWidth?: number;
   repositories: Record<string, RepositoryLocalMetadata>;
 }
 

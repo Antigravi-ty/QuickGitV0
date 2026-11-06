@@ -103,26 +103,12 @@ pub fn inspect_repository_cmd(
     app: AppHandle,
     repo_path: String,
 ) -> Result<RepositorySnapshot, String> {
+    let snapshot = scan_repository(&repo_path, None, None)?;
+
     let mut workspace = load_workspace_metadata(&app);
-    let trimmed = repo_path.trim().to_string();
-    let cached_refs = workspace
-        .repositories
-        .get(&trimmed)
-        .map(|m| m.remote_live_refs.clone())
-        .filter(|m| !m.is_empty());
-    let last_sync_ts = workspace
-        .repositories
-        .get(&trimmed)
-        .and_then(|m| m.last_remote_sync_timestamp);
-
-    let (snapshot, fresh_sync) =
-        scan_repository(&repo_path, cached_refs.as_ref(), last_sync_ts)?;
-
     let entry = ensure_repo_entry(&mut workspace, &snapshot.repo_path);
-    if let Some((live_map, sync_ts)) = fresh_sync {
-        entry.remote_live_refs = live_map;
-        entry.last_remote_sync_timestamp = Some(sync_ts);
-    }
+    entry.remote_live_refs.clear();
+    entry.last_remote_sync_timestamp = None;
     let _ = save_workspace_metadata(&app, &workspace);
     Ok(snapshot)
 }
@@ -142,7 +128,7 @@ pub fn sync_remote_origin_cmd(
         .map(|d| d.as_secs() as i64)
         .unwrap_or(0);
 
-    let (snapshot, _) = scan_repository(&repo_path, Some(&live_map), Some(now))?;
+    let snapshot = scan_repository(&repo_path, Some(&live_map), Some(now))?;
 
     let mut workspace = load_workspace_metadata(&app);
     let entry = ensure_repo_entry(&mut workspace, &snapshot.repo_path);
@@ -151,6 +137,19 @@ pub fn sync_remote_origin_cmd(
     save_workspace_metadata(&app, &workspace)?;
 
     Ok(snapshot)
+}
+
+#[tauri::command]
+pub fn set_sidebar_widths_cmd(
+    app: AppHandle,
+    left_sidebar_width: u32,
+    right_sidebar_width: u32,
+) -> Result<AppWorkspaceMetadata, String> {
+    let mut workspace = load_workspace_metadata(&app);
+    workspace.left_sidebar_width = Some(left_sidebar_width.clamp(170, 480));
+    workspace.right_sidebar_width = Some(right_sidebar_width.clamp(190, 540));
+    save_workspace_metadata(&app, &workspace)?;
+    Ok(workspace)
 }
 
 #[tauri::command]

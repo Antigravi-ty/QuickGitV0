@@ -34,10 +34,132 @@ export const DEFAULT_ORPHAN_HORIZON_COMMIT_LIMIT = 10;
 export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
   "repoPath": "/Users/dev/Workspace/RocketCompanion",
   "repoName": "RocketCompanion",
-  "headSha": "3dd58c6e70bbb3df412e1cbbe9ebf4df115b0d53",
-  "headRefName": "z/merge-nametag-freeplay-trail-and-training-cam",
+  "headSha": "904344545ef1c3fb2c58875b44c9b2e8bd7a662b",
+  "headRefName": "z/merge-clean-six-post-3dd58c6e",
   "isDetachedHead": false,
+  "remoteSyncAvailable": false,
+  "lastRemoteSyncTimestamp": null,
   "branches": [
+    {
+      "name": "origin/z/merge-g3-01-to-10",
+      "fullRef": "refs/remotes/origin/z/merge-g3-01-to-10",
+      "commitSha": "7f519274b7b251aedac0547360719e4ff1d3e5dc",
+      "isRemote": true,
+      "isTag": false,
+      "isHead": false,
+      "isOnRemoteOrigin": true,
+      "hasLocalRef": false,
+      "timestamp": 1793960480,
+      "subject": "feat(arch): merge g3-01..g3-10 Gen-3 refactoring & fix cross-branch contracts"
+    },
+    {
+      "name": "origin/z/static-training-kevpert-and-catalog-cleanup",
+      "fullRef": "refs/remotes/origin/z/static-training-kevpert-and-catalog-cleanup",
+      "commitSha": "63a6c69a23b8113ae9c47ff85dd037b49bacb639",
+      "isRemote": true,
+      "isTag": false,
+      "isHead": false,
+      "isOnRemoteOrigin": true,
+      "hasLocalRef": false,
+      "timestamp": 1793960406,
+      "subject": "refactor(static-training): update ui-core submodule and fix ShotGizmoMath radar violations"
+    },
+    {
+      "name": "origin/z/fix-director-camera-aggressiveness",
+      "fullRef": "refs/remotes/origin/z/fix-director-camera-aggressiveness",
+      "commitSha": "62e0b860b41f3753e1c1fd38491a3fcb1b3aec8c",
+      "isRemote": true,
+      "isTag": false,
+      "isHead": false,
+      "isOnRemoteOrigin": true,
+      "hasLocalRef": false,
+      "timestamp": 1793959089,
+      "subject": "fix(replay,camera): calm director camera trajectory & fix 50/50, handoff, and post-goal whips"
+    },
+    {
+      "name": "origin/z/merge-clean-six-post-3dd58c6e",
+      "fullRef": "refs/remotes/origin/z/merge-clean-six-post-3dd58c6e",
+      "commitSha": "90434454ce75bb8e5c88be2dea60ee3f0178b5dc",
+      "isRemote": true,
+      "isTag": false,
+      "isHead": true,
+      "isOnRemoteOrigin": true,
+      "hasLocalRef": true,
+      "timestamp": 1793955459,
+      "subject": "what lock again"
+    },
+    {
+      "name": "origin/z/g3-08-modes-isolation-lab",
+      "fullRef": "refs/remotes/origin/z/g3-08-modes-isolation-lab",
+      "commitSha": "98fefd8273d6e2a0c5476519d45b01184f532844",
+      "isRemote": true,
+      "isTag": false,
+      "isHead": false,
+      "isOnRemoteOrigin": true,
+      "hasLocalRef": false,
+      "timestamp": 1793954558,
+      "subject": "refactor(isolation-lab): decouple pure pipelines, encapsulate episode tracker, and type lab contracts"
+    },
+    {
+      "name": "origin/z/g3-05-modes-core-and-freeplay",
+      "fullRef": "refs/remotes/origin/z/g3-05-modes-core-and-freeplay",
+      "commitSha": "a562b0817bbc1601df1995e8fe25a7c8047b0e79",
+      "isRemote": true,
+      "isTag": false,
+      "isHead": false,
+      "isOnRemoteOrigin": true,
+      "hasLocalRef": false,
+      "timestamp": 1793953984,
+      "subject": "refactor(modes): narrow runtime/replay waist ports and eliminate untyped any (g3-05)"
+    },
+    {
+      "name": "origin/z/merge-four-post-3dd58c6e",
+      "fullRef": "refs/remotes/origin/z/merge-four-post-3dd58c6e",
+      "commitSha": "003346382265f81146827e45c668eb291bdbe771",
+      "isRemote": true,
+      "isTag": false,
+      "isHead": false,
+      "isOnRemoteOrigin": true,
+      "hasLocalRef": false,
+      "timestamp": 1793953873,
+      "subject": "chore(merge): merge 2b36521f, 8afe4ad9, c5acf655, and 3dd58c6e into z/merge-four-post-3dd58c6e"
+    },
+    {
+      "name": "origin/z/g3-10-strict-network-server-match",
+      "fullRef": "refs/remotes/origin/z/g3-10-strict-network-server-match",
+      "commitSha": "1080c65e7a3a875a1c7e7077624569def1038263",
+      "isRemote": true,
+      "isTag": false,
+      "isHead": false,
+      "isOnRemoteOrigin": true,
+      "hasLocalRef": false,
+      "timestamp": 1793953518,
+      "subject": "refactor(match): decouple MatchDomainState ports and eliminate Object.assign mutations"
+    },
+    {
+      "name": "origin/z/merge-clean-five-post-3dd58c6e",
+      "fullRef": "refs/remotes/origin/z/merge-clean-five-post-3dd58c6e",
+      "commitSha": "60609d4022a6a47caaf9a0e072abfe0c2c08ef23",
+      "isRemote": true,
+      "isTag": false,
+      "isHead": false,
+      "isOnRemoteOrigin": true,
+      "hasLocalRef": false,
+      "timestamp": 1793953436,
+      "subject": "chore(merge): merge 2b36521f, b58db448, 8afe4ad9, c5acf655, and 3dd58c6e into z/merge-clean-five-post-3dd58c6e"
+    },
+    {
+      "name": "origin/z/g3-01-game-core-pipeline",
+      "fullRef": "refs/remotes/origin/z/g3-01-game-core-pipeline",
+      "commitSha": "c472ad343392478c7f1ff62161ed3b70a6003341",
+      "isRemote": true,
+      "isTag": false,
+      "isHead": false,
+      "isOnRemoteOrigin": true,
+      "hasLocalRef": false,
+      "timestamp": 1793953122,
+      "subject": "refactor(game): decouple core runtime pipeline stages and type boundaries (g3-01)"
+    },
     {
       "name": "origin/z/g3-02-runtime-online-coordinators",
       "fullRef": "refs/remotes/origin/z/g3-02-runtime-online-coordinators",
@@ -272,9 +394,9 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "commitSha": "3dd58c6e70bbb3df412e1cbbe9ebf4df115b0d53",
       "isRemote": true,
       "isTag": false,
-      "isHead": true,
+      "isHead": false,
       "isOnRemoteOrigin": true,
-      "hasLocalRef": true,
+      "hasLocalRef": false,
       "timestamp": 1793939312,
       "subject": "fix(static-training,camera): preserve editor ball/car camera override in static-training-pack mode"
     },
@@ -1161,19 +1283,272 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "path": "src/ui-core",
       "url": "https://github.com/Antigravi-ty/RCUIModule.git",
       "branch": "main",
-      "currentWorktreeSha": "b9f0af1403bbb45348fd813883c0694a2d901296",
+      "currentWorktreeSha": "58852b7ef0912a34bc5678901234567890abcdef",
       "isDirty": false
     },
     {
       "name": "public",
       "path": "public",
-      "url": "../RocketCompanionStatics.git",
+      "url": "https://github.com/Antigravi-ty/RCPublicAssets.git",
       "branch": "main",
-      "currentWorktreeSha": "972fdef7416bdaafea1069cef0a601f8009d8706",
+      "currentWorktreeSha": "972fdefa1234567890abcdef1234567890abcdef",
       "isDirty": false
     }
   ],
   "commits": [
+    {
+      "sha": "7f519274b7b251aedac0547360719e4ff1d3e5dc",
+      "shortSha": "7f51927",
+      "parents": [
+        "c472ad343392478c7f1ff62161ed3b70a6003341",
+        "0b91c5a1d051ae6bb0b22aadb8f34391de47008f",
+        "78309e7e5bf35e1ab58352406308f7b29d5b18cc",
+        "880e3fe73d78812810805b3a74e4cf55df08fa8e",
+        "a562b0817bbc1601df1995e8fe25a7c8047b0e79",
+        "f22de3e90db3f5e35742d71379c41d4925df9c8a",
+        "9e3967c04f82089c4ab84677f5da054e3eb61d57",
+        "98fefd8273d6e2a0c5476519d45b01184f532844",
+        "a8fdfd4cbc86544aad7a165e2086ee4c305d25ca",
+        "1080c65e7a3a875a1c7e7077624569def1038263"
+      ],
+      "authorName": "antigravity-fine-grained-token[bot]",
+      "authorEmail": "328994737+antigravity-fine-grained-token[bot]@users.noreply.github.com",
+      "timestamp": 1793960480,
+      "subject": "feat(arch): merge g3-01..g3-10 Gen-3 refactoring & fix cross-branch contracts",
+      "body": "- Merge all 10 Gen-3 workstreams (g3-01 through g3-10) into a unified branch\n- Align cross-branch TypeScript port contracts in BaseGameMode, DirectorPreviewSubController, GoalReplaySessionCoordinator, goalReplayHudPipeline, StaticTrainingReplayController, PodiumCelebrationController, ExperimentalMultiBotsMatchMath, and LabTabTypes (0 tsc errors, 0 radar errors)\n\nCo-authored-by: Mark <29165094+MaBoCoMark@users.noreply.github.com>",
+      "refs": [
+        "origin/z/merge-g3-01-to-10"
+      ],
+      "staleRefs": [],
+      "submodulePointers": {
+        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
+      },
+      "changedSubmodules": []
+    },
+    {
+      "sha": "63a6c69a23b8113ae9c47ff85dd037b49bacb639",
+      "shortSha": "63a6c69",
+      "parents": [
+        "90434454ce75bb8e5c88be2dea60ee3f0178b5dc"
+      ],
+      "authorName": "antigravity-fine-grained-token[bot]",
+      "authorEmail": "328994737+antigravity-fine-grained-token[bot]@users.noreply.github.com",
+      "timestamp": 1793960406,
+      "subject": "refactor(static-training): update ui-core submodule and fix ShotGizmoMath radar violations",
+      "body": "- Update `src/ui-core` submodule (`a16d2270`): remove embedded Gzip+Base64 catalog data, clean up Kevpert F-presets (`F3, F5, F7, F8, F9, F10, F11, F12`), and style historical `Variants Ready` badges purple\n- Fix `ShotGizmoMath.ts` radar violations (`[PIPELINE MUTATION VIOLATION]` and `[UNTYPED ANY VIOLATION]`)\n\nCo-authored-by: Mark <29165094+MaBoCoMark@users.noreply.github.com>",
+      "refs": [
+        "origin/z/static-training-kevpert-and-catalog-cleanup"
+      ],
+      "staleRefs": [],
+      "submodulePointers": {
+        "src/ui-core": "a16d2270f607445af73df1205490a081525648e8",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
+      },
+      "changedSubmodules": [
+        "src/ui-core"
+      ]
+    },
+    {
+      "sha": "62e0b860b41f3753e1c1fd38491a3fcb1b3aec8c",
+      "shortSha": "62e0b86",
+      "parents": [
+        "90434454ce75bb8e5c88be2dea60ee3f0178b5dc"
+      ],
+      "authorName": "antigravity-fine-grained-token[bot]",
+      "authorEmail": "328994737+antigravity-fine-grained-token[bot]@users.noreply.github.com",
+      "timestamp": 1793959089,
+      "subject": "fix(replay,camera): calm director camera trajectory & fix 50/50, handoff, and post-goal whips",
+      "body": "- Replace violent opponent 50/50 challenge anchor/pullback/elevation overrides with bounded challenge weights\n- Smooth multi-car pass handoffs by freezing passer corner follow-through after release and starting corner-pass blends earlier\n- Project out forward sightline components from open-side lateral offsets and enforce a cone-bounded Behind-Play Invariant so the camera never drifts ahead of the active striker or ball\n- Replace the 0.45s end-of-shot goal-box teleport and 2600 UU post-goal backward sprint with a leashed post-goal drift and goal-mouth net guard\n- Smooth horizontal gaze direction (2D unit vector) and 1D pitch angle independently to eliminate the -51.2 deg Cartesian cancellation pitch plunge\n\nCo-authored-by: Mark <29165094+MaBoCoMark@users.noreply.github.com>",
+      "refs": [
+        "origin/z/fix-director-camera-aggressiveness"
+      ],
+      "staleRefs": [],
+      "submodulePointers": {
+        "src/ui-core": "5885272a03487bf4aafc814c303084f2f469acad",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
+      },
+      "changedSubmodules": []
+    },
+    {
+      "sha": "90434454ce75bb8e5c88be2dea60ee3f0178b5dc",
+      "shortSha": "9043445",
+      "parents": [
+        "2fce25a65bdd1da70a94399a13120aa8ae1f2fb0"
+      ],
+      "authorName": "Default User",
+      "authorEmail": "29165094+MaBoCoMark@users.noreply.github.com",
+      "timestamp": 1793955459,
+      "subject": "what lock again",
+      "body": "",
+      "refs": [
+        "HEAD -> z/merge-clean-six-post-3dd58c6e",
+        "origin/z/merge-clean-six-post-3dd58c6e"
+      ],
+      "staleRefs": [],
+      "submodulePointers": {
+        "src/ui-core": "5885272a03487bf4aafc814c303084f2f469acad",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
+      },
+      "changedSubmodules": []
+    },
+    {
+      "sha": "98fefd8273d6e2a0c5476519d45b01184f532844",
+      "shortSha": "98fefd8",
+      "parents": [
+        "831cfe8b77a5af08399a6314b162ae392d267fa9"
+      ],
+      "authorName": "antigravity-fine-grained-token[bot]",
+      "authorEmail": "328994737+antigravity-fine-grained-token[bot]@users.noreply.github.com",
+      "timestamp": 1793954558,
+      "subject": "refactor(isolation-lab): decouple pure pipelines, encapsulate episode tracker, and type lab contracts",
+      "body": "- Refactor probeKinematicsPipeline and kickoffDuelSimulationPipeline to return pure state/decision outputs instead of mutating passed-in objects in-place\n- Encapsulate KickoffDuelEpisodeTracker state transitions in KickoffDuelLabTab to eliminate cross-controller property mutation violations\n- Delegate single-player lab baseline reset from SubsystemIsolationLabMode to resetSinglePlayerLabBaseline to narrow runtime port surface (<=12 properties)\n- Define explicit TypeScript contracts in LabTabTypes and eliminate untyped any across all subsystem-isolation-lab modules\n\nCo-authored-by: Mark <29165094+MaBoCoMark@users.noreply.github.com>",
+      "refs": [
+        "origin/z/g3-08-modes-isolation-lab"
+      ],
+      "staleRefs": [],
+      "submodulePointers": {
+        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
+      },
+      "changedSubmodules": []
+    },
+    {
+      "sha": "2fce25a65bdd1da70a94399a13120aa8ae1f2fb0",
+      "shortSha": "2fce25a",
+      "parents": [
+        "60609d4022a6a47caaf9a0e072abfe0c2c08ef23",
+        "7b22fe9f3457536b3168bfbcce4bcbc18eb40bee"
+      ],
+      "authorName": "antigravity-fine-grained-token[bot]",
+      "authorEmail": "328994737+antigravity-fine-grained-token[bot]@users.noreply.github.com",
+      "timestamp": 1793954017,
+      "subject": "chore(merge): merge 7b22fe9f (z/director-cinematic-camera-v2) into z/merge-clean-five-post-3dd58c6e (60609d40)",
+      "body": "- Losslessly unify all 6 commits (2b36521f, b58db448, 7b22fe9f, 8afe4ad9, c5acf655, 3dd58c6e) onto z/merge-clean-six-post-3dd58c6e\n- Combine ReplayDirectorCameraSubController & phase-aware cinematic director camera v2 (7b22fe9f) with vehicle model/hitbox & car pose preservation (2b36521f), Replay Viewer perf & audio LOD optimizations (b58db448), trajectory & takeover physics fixes (8afe4ad9), and static training & ball camera updates (c5acf655)\n- Type replayDirectorCarRosterPipeline.ts and align cross-branch TypeScript interfaces (0 tsc --noEmit errors, 0 src/replay radar violations)\n\nCo-authored-by: Mark <29165094+MaBoCoMark@users.noreply.github.com>",
+      "refs": [],
+      "staleRefs": [],
+      "submodulePointers": {
+        "src/ui-core": "5885272a03487bf4aafc814c303084f2f469acad",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
+      },
+      "changedSubmodules": []
+    },
+    {
+      "sha": "a562b0817bbc1601df1995e8fe25a7c8047b0e79",
+      "shortSha": "a562b08",
+      "parents": [
+        "831cfe8b77a5af08399a6314b162ae392d267fa9"
+      ],
+      "authorName": "antigravity-fine-grained-token[bot]",
+      "authorEmail": "328994737+antigravity-fine-grained-token[bot]@users.noreply.github.com",
+      "timestamp": 1793953984,
+      "subject": "refactor(modes): narrow runtime/replay waist ports and eliminate untyped any (g3-05)",
+      "body": "- Declare strong GameModeRuntimePort in BaseGameMode and encapsulate shared kickoff/loadout helpers\n- Narrow this.runtime property reads across BotMatchMode, FreeplayMode, and PodiumCelebrationController\n- Extract cohesive replay timeline/camera session helpers to narrow replayController reads in DirectorPreviewSubController\n- Replace all untyped any across BaseGameMode, FreeplayMode, PodiumCelebrationController, DirectorPreviewSubController, GoalReplaySessionCoordinator, and goalReplayHudPipeline\n\nCo-authored-by: Mark <29165094+MaBoCoMark@users.noreply.github.com>",
+      "refs": [
+        "origin/z/g3-05-modes-core-and-freeplay"
+      ],
+      "staleRefs": [],
+      "submodulePointers": {
+        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
+      },
+      "changedSubmodules": []
+    },
+    {
+      "sha": "003346382265f81146827e45c668eb291bdbe771",
+      "shortSha": "0033463",
+      "parents": [
+        "2b36521f49790d8fcdbfa924170c1b93857504b2",
+        "8afe4ad919f03bc5430158ecc769300ef9eea2f7",
+        "c5acf6554d24cad925b23eefd41ff0f55225f289",
+        "3dd58c6e70bbb3df412e1cbbe9ebf4df115b0d53"
+      ],
+      "authorName": "antigravity-fine-grained-token[bot]",
+      "authorEmail": "328994737+antigravity-fine-grained-token[bot]@users.noreply.github.com",
+      "timestamp": 1793953873,
+      "subject": "chore(merge): merge 2b36521f, 8afe4ad9, c5acf655, and 3dd58c6e into z/merge-four-post-3dd58c6e",
+      "body": "- Zero-conflict merge of 2b36521f49790d8fcdbfa924170c1b93857504b2, 8afe4ad919f03bc5430158ecc769300ef9eea2f7, c5acf6554d24cad925b23eefd41ff0f55225f289, and 3dd58c6e70bbb3df412e1cbbe9ebf4df115b0d53\n\nCo-authored-by: Mark <29165094+MaBoCoMark@users.noreply.github.com>",
+      "refs": [
+        "origin/z/merge-four-post-3dd58c6e"
+      ],
+      "staleRefs": [],
+      "submodulePointers": {
+        "src/ui-core": "e597440fa008e20ab9a33281ac7afd4a45cf9de4",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
+      },
+      "changedSubmodules": [
+        "src/ui-core"
+      ]
+    },
+    {
+      "sha": "1080c65e7a3a875a1c7e7077624569def1038263",
+      "shortSha": "1080c65",
+      "parents": [
+        "831cfe8b77a5af08399a6314b162ae392d267fa9"
+      ],
+      "authorName": "antigravity-fine-grained-token[bot]",
+      "authorEmail": "328994737+antigravity-fine-grained-token[bot]@users.noreply.github.com",
+      "timestamp": 1793953518,
+      "subject": "refactor(match): decouple MatchDomainState ports and eliminate Object.assign mutations",
+      "body": "- Remove private domainState() cheat aliases across MatchPhaseLifecycleSubController, MatchRosterSubController, MatchCommandQueueSubController, MatchSessionAdmin, and MatchSystemControlSubController\n- Encapsulate cohesive match domain state queries, snapshot builders, and phase/clock/score transitions inside MatchDomainState methods so all sub-controllers read <= 12 domain properties\n- Convert Object.assign player slot mutations in matchLoadoutAndSpawnPipeline, matchRosterPhysicsAndBotPipeline, and matchSessionRoleSwitchPipeline into pure Partial<MatchPlayerSlot> patch builders applied via MatchDomainState.updatePlayerSlot\n\nCo-authored-by: Mark <29165094+MaBoCoMark@users.noreply.github.com>",
+      "refs": [
+        "origin/z/g3-10-strict-network-server-match"
+      ],
+      "staleRefs": [],
+      "submodulePointers": {
+        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
+      },
+      "changedSubmodules": []
+    },
+    {
+      "sha": "60609d4022a6a47caaf9a0e072abfe0c2c08ef23",
+      "shortSha": "60609d4",
+      "parents": [
+        "2b36521f49790d8fcdbfa924170c1b93857504b2",
+        "b58db4483e765ee3081730f43a683bb995501253",
+        "8afe4ad919f03bc5430158ecc769300ef9eea2f7",
+        "c5acf6554d24cad925b23eefd41ff0f55225f289",
+        "3dd58c6e70bbb3df412e1cbbe9ebf4df115b0d53"
+      ],
+      "authorName": "antigravity-fine-grained-token[bot]",
+      "authorEmail": "328994737+antigravity-fine-grained-token[bot]@users.noreply.github.com",
+      "timestamp": 1793953436,
+      "subject": "chore(merge): merge 2b36521f, b58db448, 8afe4ad9, c5acf655, and 3dd58c6e into z/merge-clean-five-post-3dd58c6e",
+      "body": "- Merge 2b36521f49790d8fcdbfa924170c1b93857504b2 (z/fix-goal-replay-director-vehicle-and-pose): record vehicle models and preserve accurate car poses in Goal Replay Director\n- Merge b58db4483e765ee3081730f43a683bb995501253 (z/fix-replay-viewer-perf-and-telemetry): eliminate Replay Viewer progressive slowdown, residual multi-car overhead, and audio LOD hitches\n- Merge 8afe4ad919f03bc5430158ecc769300ef9eea2f7 (z/fix-rc-replay-viewer-and-trajectory): fix RC Replay Viewer takeover physics and trajectory line\n- Merge c5acf6554d24cad925b23eefd41ff0f55225f289 (z/merge-static-training-and-ballcam): static training pack & ball camera fixes\n- Base 3dd58c6e70bbb3df412e1cbbe9ebf4df115b0d53 (z/merge-nametag-freeplay-trail-and-training-cam)\n- Unify Standalone Replay Viewer and Freeplay Rewinder active checks in GameRenderSubsystem.ts\n- Update src/ui-core submodule to 5885272a03487bf4aafc814c303084f2f469acad (merge e597440f and aa8f5ae5)\n\nCo-authored-by: Mark <29165094+MaBoCoMark@users.noreply.github.com>",
+      "refs": [
+        "origin/z/merge-clean-five-post-3dd58c6e"
+      ],
+      "staleRefs": [],
+      "submodulePointers": {
+        "src/ui-core": "5885272a03487bf4aafc814c303084f2f469acad",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
+      },
+      "changedSubmodules": [
+        "src/ui-core"
+      ]
+    },
+    {
+      "sha": "c472ad343392478c7f1ff62161ed3b70a6003341",
+      "shortSha": "c472ad3",
+      "parents": [
+        "831cfe8b77a5af08399a6314b162ae392d267fa9"
+      ],
+      "authorName": "antigravity-fine-grained-token[bot]",
+      "authorEmail": "328994737+antigravity-fine-grained-token[bot]@users.noreply.github.com",
+      "timestamp": 1793953122,
+      "subject": "refactor(game): decouple core runtime pipeline stages and type boundaries (g3-01)",
+      "body": "1. Remove unused pass-through setters on GameRuntime (reducing proxy count to <=8 and file length below 580L waterline).\n2. Narrow PresentationStage, SimulationStage, GameCameraSubsystem, and GameRenderSubsystem runtime dependencies via explicit port interfaces and FrameContext transient fields.\n3. Declare explicit TypeScript boundary interfaces across GameBootstrap, ShaderPrewarmer, FramePipeline, CarActionEventSynthesizer, hudTransientFramePipeline, ScenarioAutorunBootstrap, and ScenarioTypes.\n\nCo-authored-by: Mark <29165094+MaBoCoMark@users.noreply.github.com>",
+      "refs": [
+        "origin/z/g3-01-game-core-pipeline"
+      ],
+      "staleRefs": [],
+      "submodulePointers": {
+        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
+      },
+      "changedSubmodules": []
+    },
     {
       "sha": "0b91c5a1d051ae6bb0b22aadb8f34391de47008f",
       "shortSha": "0b91c5a",
@@ -1190,8 +1565,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1211,8 +1586,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1232,8 +1607,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1253,8 +1628,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1274,8 +1649,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1295,8 +1670,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "2acfe7316b978160cd3d7f3aa9e7b02623911182",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1316,8 +1691,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1338,8 +1713,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "b9f0af1403bbb45348fd813883c0694a2d901296",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1359,10 +1734,12 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "aa8f5ae5bbe310769fbbf9ef470e05dc376f05af",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
-      "changedSubmodules": []
+      "changedSubmodules": [
+        "src/ui-core"
+      ]
     },
     {
       "sha": "7b22fe9f3457536b3168bfbcce4bcbc18eb40bee",
@@ -1380,8 +1757,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "2acfe7316b978160cd3d7f3aa9e7b02623911182",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1401,8 +1778,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "2acfe7316b978160cd3d7f3aa9e7b02623911182",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1422,8 +1799,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1444,8 +1821,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1466,10 +1843,12 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "e597440fa008e20ab9a33281ac7afd4a45cf9de4",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
-      "changedSubmodules": []
+      "changedSubmodules": [
+        "src/ui-core"
+      ]
     },
     {
       "sha": "96910e4da9f8276aedda1db25d5cb2ab74d27fb1",
@@ -1487,8 +1866,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "49427e777137027067c25274ab59aba028f1a1a9",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1508,8 +1887,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1529,8 +1908,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "49427e777137027067c25274ab59aba028f1a1a9",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1550,8 +1929,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "b9f0af1403bbb45348fd813883c0694a2d901296"
+        "src/ui-core": "b9f0af1403bbb45348fd813883c0694a2d901296",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -1573,8 +1952,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "755cf7375c6ad4277709289dc530a5b9bf59c84f"
+        "src/ui-core": "755cf7375c6ad4277709289dc530a5b9bf59c84f",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1595,8 +1974,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae"
+        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -1614,13 +1993,12 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "subject": "fix(static-training,camera): preserve editor ball/car camera override in static-training-pack mode",
       "body": "- Fix GameCameraSubsystem._reconcileSceneCameraOverrides checking 'static-training' instead of 'static-training-pack', which deactivated EditorCameraController every frame and forced PovCameraController (car view) even when in Ball Speed ('ball-speed') sub-mode\n- Auto-switch editSubMode to 'ball-speed' when adjusting ball parameters and back to 'car-heading' / 'car-speed' when adjusting car parameters in the Shot Inspector UI (src/ui-core @ 2acfe731)\n- Remove dead duplicated computeEditorSubModeCameraPose from ShotGizmoMath.ts (owned by EditorCameraController.syncShotPose in SceneOverrideCameraControllers.ts)\n\nCo-authored-by: Mark <29165094+MaBoCoMark@users.noreply.github.com>",
       "refs": [
-        "HEAD -> z/merge-nametag-freeplay-trail-and-training-cam",
         "origin/z/merge-nametag-freeplay-trail-and-training-cam"
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "2acfe7316b978160cd3d7f3aa9e7b02623911182"
+        "src/ui-core": "2acfe7316b978160cd3d7f3aa9e7b02623911182",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -1642,8 +2020,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "a16403f76ba486179593354c6a6826f238420e7b"
+        "src/ui-core": "a16403f76ba486179593354c6a6826f238420e7b",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -1665,8 +2043,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "49427e777137027067c25274ab59aba028f1a1a9"
+        "src/ui-core": "49427e777137027067c25274ab59aba028f1a1a9",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1686,8 +2064,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "b6dccb672f7e0dab19d0c14db361054e58956ac6"
+        "src/ui-core": "b6dccb672f7e0dab19d0c14db361054e58956ac6",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -1709,8 +2087,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "816b7c908e262f8932eb2e908a2ba758fb992ca1"
+        "src/ui-core": "816b7c908e262f8932eb2e908a2ba758fb992ca1",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -1732,8 +2110,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "755cf7375c6ad4277709289dc530a5b9bf59c84f"
+        "src/ui-core": "755cf7375c6ad4277709289dc530a5b9bf59c84f",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1754,8 +2132,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "6f8acc2a89fadcf265ae54c5b7afd440ff7d91cd"
+        "src/ui-core": "6f8acc2a89fadcf265ae54c5b7afd440ff7d91cd",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -1777,8 +2155,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "755cf7375c6ad4277709289dc530a5b9bf59c84f"
+        "src/ui-core": "755cf7375c6ad4277709289dc530a5b9bf59c84f",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1798,8 +2176,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "755cf7375c6ad4277709289dc530a5b9bf59c84f"
+        "src/ui-core": "755cf7375c6ad4277709289dc530a5b9bf59c84f",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1819,8 +2197,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae"
+        "src/ui-core": "4c07185b22e004e8045f491607ad2ac04c5587ae",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -1842,8 +2220,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "755cf7375c6ad4277709289dc530a5b9bf59c84f"
+        "src/ui-core": "755cf7375c6ad4277709289dc530a5b9bf59c84f",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1867,8 +2245,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "755cf7375c6ad4277709289dc530a5b9bf59c84f"
+        "src/ui-core": "755cf7375c6ad4277709289dc530a5b9bf59c84f",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -1891,8 +2269,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "49427e777137027067c25274ab59aba028f1a1a9"
+        "src/ui-core": "49427e777137027067c25274ab59aba028f1a1a9",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -1915,8 +2293,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "016ca7323d9a16376b28e86643f9e63806755e81"
+        "src/ui-core": "016ca7323d9a16376b28e86643f9e63806755e81",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -1938,8 +2316,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "b4aac6ee08f7cedd6dce7081e27fb1be6cb3dbfa"
+        "src/ui-core": "b4aac6ee08f7cedd6dce7081e27fb1be6cb3dbfa",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -1959,8 +2337,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "5ecc670fcffbe24bc088984069b31a72e7df39d1"
+        "src/ui-core": "5ecc670fcffbe24bc088984069b31a72e7df39d1",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -1982,8 +2360,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "b4aac6ee08f7cedd6dce7081e27fb1be6cb3dbfa"
+        "src/ui-core": "b4aac6ee08f7cedd6dce7081e27fb1be6cb3dbfa",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2003,8 +2381,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "fc4795f60797ebb3073d9b12dfac5d7688a1a029"
+        "src/ui-core": "fc4795f60797ebb3073d9b12dfac5d7688a1a029",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2026,8 +2404,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "02d8a85f2a774160c04264cd82877d4543b4e998"
+        "src/ui-core": "02d8a85f2a774160c04264cd82877d4543b4e998",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2047,8 +2425,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "b4aac6ee08f7cedd6dce7081e27fb1be6cb3dbfa"
+        "src/ui-core": "b4aac6ee08f7cedd6dce7081e27fb1be6cb3dbfa",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2068,8 +2446,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "ce13b83ceb7797032f5657ba86b327900960d3d6"
+        "src/ui-core": "ce13b83ceb7797032f5657ba86b327900960d3d6",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2091,8 +2469,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "b4aac6ee08f7cedd6dce7081e27fb1be6cb3dbfa"
+        "src/ui-core": "b4aac6ee08f7cedd6dce7081e27fb1be6cb3dbfa",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2112,8 +2490,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "49c3389426e021de31bbd6aa194c74e8fedb6760"
+        "src/ui-core": "49c3389426e021de31bbd6aa194c74e8fedb6760",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2135,8 +2513,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "57c12cbf2e07b2839a256ef8bd7c3da2d938b25a"
+        "src/ui-core": "57c12cbf2e07b2839a256ef8bd7c3da2d938b25a",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2158,8 +2536,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "cd98e7c17218ed0028ac009370abdae7967f941b"
+        "src/ui-core": "cd98e7c17218ed0028ac009370abdae7967f941b",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2181,8 +2559,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "b4aac6ee08f7cedd6dce7081e27fb1be6cb3dbfa"
+        "src/ui-core": "b4aac6ee08f7cedd6dce7081e27fb1be6cb3dbfa",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2202,8 +2580,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "b4aac6ee08f7cedd6dce7081e27fb1be6cb3dbfa"
+        "src/ui-core": "b4aac6ee08f7cedd6dce7081e27fb1be6cb3dbfa",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2223,8 +2601,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "86982b410e4d5c4ebb80ee490f05a6c3aaec4a0b"
+        "src/ui-core": "86982b410e4d5c4ebb80ee490f05a6c3aaec4a0b",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2246,8 +2624,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "b3df7fc793d0b009c7c79feb90202052d43f7e59"
+        "src/ui-core": "b3df7fc793d0b009c7c79feb90202052d43f7e59",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2267,8 +2645,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "7d7942dcadf411b9ef1b0d50c39aed09d064421f"
+        "src/ui-core": "7d7942dcadf411b9ef1b0d50c39aed09d064421f",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2290,8 +2668,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "b253f88c9d04827f231034ed3616c64dd1654dc5"
+        "src/ui-core": "b253f88c9d04827f231034ed3616c64dd1654dc5",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2311,8 +2689,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "02d8a85f2a774160c04264cd82877d4543b4e998"
+        "src/ui-core": "02d8a85f2a774160c04264cd82877d4543b4e998",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2334,8 +2712,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "2c8b8b42324e826b8392628855a110bb33f0271d"
+        "src/ui-core": "2c8b8b42324e826b8392628855a110bb33f0271d",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2357,8 +2735,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "73a6a30f6eb562fdaf4780481ae44bf6c40e2b45"
+        "src/ui-core": "73a6a30f6eb562fdaf4780481ae44bf6c40e2b45",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2381,8 +2759,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "b4aac6ee08f7cedd6dce7081e27fb1be6cb3dbfa"
+        "src/ui-core": "b4aac6ee08f7cedd6dce7081e27fb1be6cb3dbfa",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2405,8 +2783,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "5881b2b4bbb9ebc50a95836d23d082bd75ee7bc3"
+        "src/ui-core": "5881b2b4bbb9ebc50a95836d23d082bd75ee7bc3",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2428,8 +2806,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "5881b2b4bbb9ebc50a95836d23d082bd75ee7bc3"
+        "src/ui-core": "5881b2b4bbb9ebc50a95836d23d082bd75ee7bc3",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2447,8 +2825,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "dbf365a2257e7e8557d91c907901cad523cff851"
+        "src/ui-core": "dbf365a2257e7e8557d91c907901cad523cff851",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2470,8 +2848,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "9e8bddb974c021507880aa33c9bee2bfb1035f6c"
+        "src/ui-core": "9e8bddb974c021507880aa33c9bee2bfb1035f6c",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2493,8 +2871,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "18814c4afcf2d07d143165da4feb6affa99d054b"
+        "src/ui-core": "18814c4afcf2d07d143165da4feb6affa99d054b",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2514,8 +2892,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "5881b2b4bbb9ebc50a95836d23d082bd75ee7bc3"
+        "src/ui-core": "5881b2b4bbb9ebc50a95836d23d082bd75ee7bc3",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2535,8 +2913,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "5881b2b4bbb9ebc50a95836d23d082bd75ee7bc3"
+        "src/ui-core": "5881b2b4bbb9ebc50a95836d23d082bd75ee7bc3",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2556,8 +2934,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "06b2cdf4395c6408ff929350aa35a8d2fa14febb"
+        "src/ui-core": "06b2cdf4395c6408ff929350aa35a8d2fa14febb",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2579,8 +2957,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "5881b2b4bbb9ebc50a95836d23d082bd75ee7bc3"
+        "src/ui-core": "5881b2b4bbb9ebc50a95836d23d082bd75ee7bc3",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2600,8 +2978,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "4e832ae31e6171894349958ed8c708d8fce5bc9a"
+        "src/ui-core": "4e832ae31e6171894349958ed8c708d8fce5bc9a",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2623,8 +3001,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "5881b2b4bbb9ebc50a95836d23d082bd75ee7bc3"
+        "src/ui-core": "5881b2b4bbb9ebc50a95836d23d082bd75ee7bc3",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2644,8 +3022,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "2cd82f33f9d342704344c2a59612e8825dd7e78b"
+        "src/ui-core": "2cd82f33f9d342704344c2a59612e8825dd7e78b",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2665,8 +3043,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "3f3b8f3f3528c9b359518ced5d2c00884afb8133"
+        "src/ui-core": "3f3b8f3f3528c9b359518ced5d2c00884afb8133",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2689,8 +3067,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "5881b2b4bbb9ebc50a95836d23d082bd75ee7bc3"
+        "src/ui-core": "5881b2b4bbb9ebc50a95836d23d082bd75ee7bc3",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2710,8 +3088,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "18d7123efb4e1667da09cf9e4d297de2bead49f8"
+        "src/ui-core": "18d7123efb4e1667da09cf9e4d297de2bead49f8",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2733,8 +3111,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "18814c4afcf2d07d143165da4feb6affa99d054b"
+        "src/ui-core": "18814c4afcf2d07d143165da4feb6affa99d054b",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2754,8 +3132,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "e52471dcae323f2f1c95ecc112784800e17ca894"
+        "src/ui-core": "e52471dcae323f2f1c95ecc112784800e17ca894",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2775,8 +3153,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "5f1e282be9f000d5200879aeb43b91b3389e22c7"
+        "src/ui-core": "5f1e282be9f000d5200879aeb43b91b3389e22c7",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2798,8 +3176,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "b41e297920b155e8de80f28999012f4a24e342bc"
+        "src/ui-core": "b41e297920b155e8de80f28999012f4a24e342bc",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2819,8 +3197,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "e52471dcae323f2f1c95ecc112784800e17ca894"
+        "src/ui-core": "e52471dcae323f2f1c95ecc112784800e17ca894",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2840,8 +3218,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "e52471dcae323f2f1c95ecc112784800e17ca894"
+        "src/ui-core": "e52471dcae323f2f1c95ecc112784800e17ca894",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2864,8 +3242,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "18814c4afcf2d07d143165da4feb6affa99d054b"
+        "src/ui-core": "18814c4afcf2d07d143165da4feb6affa99d054b",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2888,8 +3266,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "3e86f1a13bee47dbbf020c8ab23aa4f5eaeb4b20"
+        "src/ui-core": "3e86f1a13bee47dbbf020c8ab23aa4f5eaeb4b20",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2911,8 +3289,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "a2fcaafe471b864dfa5e74e90dd169d08ea6c50a"
+        "src/ui-core": "a2fcaafe471b864dfa5e74e90dd169d08ea6c50a",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2932,8 +3310,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "e52471dcae323f2f1c95ecc112784800e17ca894"
+        "src/ui-core": "e52471dcae323f2f1c95ecc112784800e17ca894",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -2953,8 +3331,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "a1e0cdbd0ba296a0f645581f8494253a46b7df11"
+        "src/ui-core": "a1e0cdbd0ba296a0f645581f8494253a46b7df11",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -2977,8 +3355,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "a2fcaafe471b864dfa5e74e90dd169d08ea6c50a"
+        "src/ui-core": "a2fcaafe471b864dfa5e74e90dd169d08ea6c50a",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -3000,8 +3378,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "e52471dcae323f2f1c95ecc112784800e17ca894"
+        "src/ui-core": "e52471dcae323f2f1c95ecc112784800e17ca894",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3021,8 +3399,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "e52471dcae323f2f1c95ecc112784800e17ca894"
+        "src/ui-core": "e52471dcae323f2f1c95ecc112784800e17ca894",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3043,8 +3421,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "9a2887aefcec7a148eca1c15e2282796be0a69f0"
+        "src/ui-core": "9a2887aefcec7a148eca1c15e2282796be0a69f0",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -3067,8 +3445,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "974688b09fe2f06d494a9c9f57cdc35dd3a81a90"
+        "src/ui-core": "974688b09fe2f06d494a9c9f57cdc35dd3a81a90",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -3090,8 +3468,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "e52471dcae323f2f1c95ecc112784800e17ca894"
+        "src/ui-core": "e52471dcae323f2f1c95ecc112784800e17ca894",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3112,8 +3490,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "974688b09fe2f06d494a9c9f57cdc35dd3a81a90"
+        "src/ui-core": "974688b09fe2f06d494a9c9f57cdc35dd3a81a90",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -3138,8 +3516,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "50aad9d7e6eba80b91c2e5cca3050a81b6a3c982"
+        "src/ui-core": "50aad9d7e6eba80b91c2e5cca3050a81b6a3c982",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -3165,8 +3543,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "d91af9621002ba9a204a04afce9c528891c1bdc6"
+        "src/ui-core": "d91af9621002ba9a204a04afce9c528891c1bdc6",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -3188,8 +3566,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "8f0aa3b30d0eb1afa4267415e47a8cf9aeab9687"
+        "src/ui-core": "8f0aa3b30d0eb1afa4267415e47a8cf9aeab9687",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -3211,8 +3589,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "a93b63060986bc1dd39e9692257731d9f0979c81"
+        "src/ui-core": "a93b63060986bc1dd39e9692257731d9f0979c81",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -3234,8 +3612,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "e52471dcae323f2f1c95ecc112784800e17ca894"
+        "src/ui-core": "e52471dcae323f2f1c95ecc112784800e17ca894",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -3257,8 +3635,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "f38ade4a3afb806b025ae86c6086bb9bf92452a9"
+        "src/ui-core": "f38ade4a3afb806b025ae86c6086bb9bf92452a9",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3278,8 +3656,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "f38ade4a3afb806b025ae86c6086bb9bf92452a9"
+        "src/ui-core": "f38ade4a3afb806b025ae86c6086bb9bf92452a9",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3300,8 +3678,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "85e4456589882e4c712b5d49a5d768a9b8e61d87"
+        "src/ui-core": "85e4456589882e4c712b5d49a5d768a9b8e61d87",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -3323,8 +3701,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "e220bf557a005b4a310a00f092f1c9e5b2b60cd6"
+        "src/ui-core": "e220bf557a005b4a310a00f092f1c9e5b2b60cd6",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -3346,8 +3724,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "78423e76217b034a9876b239372b84a3fb6e9939"
+        "src/ui-core": "75dbe64031a22598df6ce317aac82bf144171ef9",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3367,8 +3745,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "719a6fd33995ffe5262db12667f75cdf76061857"
+        "src/ui-core": "719a6fd33995ffe5262db12667f75cdf76061857",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -3390,8 +3768,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "f38ade4a3afb806b025ae86c6086bb9bf92452a9"
+        "src/ui-core": "f38ade4a3afb806b025ae86c6086bb9bf92452a9",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -3413,8 +3791,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "5c665b9a19666f41290a07a4b2c42c2dd690730f"
+        "src/ui-core": "5c665b9a19666f41290a07a4b2c42c2dd690730f",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": [
         "src/ui-core"
@@ -3436,8 +3814,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "public": "972fdef7416bdaafea1069cef0a601f8009d8706",
-        "src/ui-core": "78423e76217b034a9876b239372b84a3fb6e9939"
+        "src/ui-core": "d4b26dc69fcd11bec4c154d6b7d75695e25b1303",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3459,10 +3837,12 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "75dbe64031a22598df6ce317aac82bf144171ef9",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
-      "changedSubmodules": []
+      "changedSubmodules": [
+        "src/ui-core"
+      ]
     },
     {
       "sha": "0d1e824844916e8e7491de5d2489a37ebc107174",
@@ -3478,10 +3858,12 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "d4b26dc69fcd11bec4c154d6b7d75695e25b1303",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
-      "changedSubmodules": []
+      "changedSubmodules": [
+        "src/ui-core"
+      ]
     },
     {
       "sha": "e6522cca01b120ce74c4df2d34d71dda805c9ec1",
@@ -3500,10 +3882,12 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       ],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "97c1361ec56c0c85c3334a01404e58e93784b85c",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
-      "changedSubmodules": []
+      "changedSubmodules": [
+        "src/ui-core"
+      ]
     },
     {
       "sha": "d74926277ca73636ac76de83880cf002cf325aa8",
@@ -3520,10 +3904,12 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "594e3a4fe1715cbc92e29daa45503b5123cfb57d",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
-      "changedSubmodules": []
+      "changedSubmodules": [
+        "src/ui-core"
+      ]
     },
     {
       "sha": "65dd69a3d822912e7806f3f00b00bcf4958cad7e",
@@ -3539,8 +3925,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "04e3de139b145d50c164ab167c632b8ea5312d53",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3558,10 +3944,12 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "04e3de139b145d50c164ab167c632b8ea5312d53",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
-      "changedSubmodules": []
+      "changedSubmodules": [
+        "src/ui-core"
+      ]
     },
     {
       "sha": "4043b5352b68ae8b346037796d9230fed9eb4b31",
@@ -3577,8 +3965,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "7eb6d6e010a233e3328015d60796dab144411b73",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3597,8 +3985,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "7eb6d6e010a233e3328015d60796dab144411b73",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3617,10 +4005,12 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "3db0a338226ff45983e9e2bc5fa3e2514ed2aa99",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
-      "changedSubmodules": []
+      "changedSubmodules": [
+        "src/ui-core"
+      ]
     },
     {
       "sha": "18ea6f49acbec21110288cbaa99eac5784fd488f",
@@ -3636,8 +4026,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "7eb6d6e010a233e3328015d60796dab144411b73",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3660,10 +4050,12 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "4b9e2c99a38e9a1c8959bc2979f678ca605de528",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
-      "changedSubmodules": []
+      "changedSubmodules": [
+        "src/ui-core"
+      ]
     },
     {
       "sha": "6e85e131d750dc2084811fe53c2a8948a2fd86c8",
@@ -3679,8 +4071,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "7eb6d6e010a233e3328015d60796dab144411b73",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3698,8 +4090,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "7eb6d6e010a233e3328015d60796dab144411b73",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3717,8 +4109,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "7eb6d6e010a233e3328015d60796dab144411b73",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3736,8 +4128,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "7eb6d6e010a233e3328015d60796dab144411b73",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3755,8 +4147,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "7eb6d6e010a233e3328015d60796dab144411b73",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3774,8 +4166,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "7eb6d6e010a233e3328015d60796dab144411b73",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3793,8 +4185,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "7eb6d6e010a233e3328015d60796dab144411b73",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3812,8 +4204,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "7eb6d6e010a233e3328015d60796dab144411b73",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3831,8 +4223,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "7eb6d6e010a233e3328015d60796dab144411b73",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3850,8 +4242,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "7eb6d6e010a233e3328015d60796dab144411b73",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
       "changedSubmodules": []
     },
@@ -3875,10 +4267,13 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "7eb6d6e010a233e3328015d60796dab144411b73",
+        "public": "972fdef7416bdaafea1069cef0a601f8009d8706"
       },
-      "changedSubmodules": []
+      "changedSubmodules": [
+        "public",
+        "src/ui-core"
+      ]
     },
     {
       "sha": "ffab5b19f7c47703fba4b1fe9c05f043beb1fa35",
@@ -3894,8 +4289,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "9dd6479997fd6a3e4f7eb7bb39d507e5dfabbeae",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -3913,8 +4308,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "9dd6479997fd6a3e4f7eb7bb39d507e5dfabbeae",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -3932,8 +4327,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "9dd6479997fd6a3e4f7eb7bb39d507e5dfabbeae",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -3951,8 +4346,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "9dd6479997fd6a3e4f7eb7bb39d507e5dfabbeae",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -3971,8 +4366,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -3991,8 +4386,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4011,10 +4406,12 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "9dd6479997fd6a3e4f7eb7bb39d507e5dfabbeae",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
-      "changedSubmodules": []
+      "changedSubmodules": [
+        "src/ui-core"
+      ]
     },
     {
       "sha": "9b77a5afbbb21068bd1a3a5c26c7a6e7b41ac361",
@@ -4031,10 +4428,12 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "be956dad4fc1196427950fa592314868960c6159",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
-      "changedSubmodules": []
+      "changedSubmodules": [
+        "src/ui-core"
+      ]
     },
     {
       "sha": "231d28ccc0230cd41f0b72e0372b1203cc2c925d",
@@ -4051,8 +4450,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4071,8 +4470,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4091,8 +4490,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4110,8 +4509,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4129,8 +4528,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4148,8 +4547,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4167,8 +4566,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4186,8 +4585,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4205,8 +4604,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4224,8 +4623,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4243,8 +4642,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4262,8 +4661,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4281,8 +4680,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4300,8 +4699,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4319,8 +4718,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4339,10 +4738,12 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "6d8c591a372fd710a1aecd9c6a4083816a59571d",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
-      "changedSubmodules": []
+      "changedSubmodules": [
+        "src/ui-core"
+      ]
     },
     {
       "sha": "06a8b8c91bd62d1e35a9f95572774fc6073372d1",
@@ -4359,8 +4760,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "78423e76217b034a9876b239372b84a3fb6e9939",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4379,8 +4780,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "78423e76217b034a9876b239372b84a3fb6e9939",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4399,8 +4800,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "78423e76217b034a9876b239372b84a3fb6e9939",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4419,8 +4820,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "78423e76217b034a9876b239372b84a3fb6e9939",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4438,8 +4839,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "78423e76217b034a9876b239372b84a3fb6e9939",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4457,8 +4858,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "78423e76217b034a9876b239372b84a3fb6e9939",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4476,8 +4877,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "78423e76217b034a9876b239372b84a3fb6e9939",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4495,8 +4896,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "78423e76217b034a9876b239372b84a3fb6e9939",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4514,8 +4915,8 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "78423e76217b034a9876b239372b84a3fb6e9939",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
       "changedSubmodules": []
     },
@@ -4531,10 +4932,13 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
       "refs": [],
       "staleRefs": [],
       "submodulePointers": {
-        "src/ui-core": "4c07185a98b12d34e09f11223344556677889900",
-        "public": "89ab12cd34ef5678901234567890abcdef123456"
+        "src/ui-core": "78423e76217b034a9876b239372b84a3fb6e9939",
+        "public": "f37d2d36c83c39c342d87c7d9fd64c21b9ced61b"
       },
-      "changedSubmodules": []
+      "changedSubmodules": [
+        "public",
+        "src/ui-core"
+      ]
     },
     {
       "sha": "78423e76217b034a9876b239372b84a3fb6e9939",
@@ -4581,7 +4985,5 @@ export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
     "mainRepoDirtyFiles": [],
     "dirtySubmodules": [],
     "summaryMessage": "Working tree and all submodules are clean. Ready for detached state inspection."
-  },
-  "remoteSyncAvailable": true,
-  "lastRemoteSyncTimestamp": 1793951300
+  }
 };

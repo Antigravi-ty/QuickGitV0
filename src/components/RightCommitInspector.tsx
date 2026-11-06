@@ -133,18 +133,26 @@ export const RightCommitInspector: React.FC = () => {
         flexDirection: "column",
         height: "100%",
         overflowY: "auto",
-        padding: 12,
-        gap: 12,
+        overflowX: "hidden",
+        padding: "8px 8px 14px 8px",
+        gap: 10,
       }}
     >
       {/* Guarded Detached Checkout Card */}
       <div className="primer-box">
         <div
           className="primer-box-header"
-          style={{ padding: "8px 12px", fontSize: 12 }}
+          style={{ padding: "7px 10px", fontSize: 11.5 }}
         >
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <Play size={13} />
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 5,
+              minWidth: 0,
+            }}
+          >
+            <Play size={13} style={{ flexShrink: 0 }} />
             <span>Detached State &amp; Submodule Sync</span>
           </span>
           {isCurrentHead && (
@@ -156,7 +164,7 @@ export const RightCommitInspector: React.FC = () => {
         <div
           className="primer-box-body"
           style={{
-            padding: 10,
+            padding: 8,
             display: "flex",
             flexDirection: "column",
             gap: 8,
@@ -164,9 +172,10 @@ export const RightCommitInspector: React.FC = () => {
         >
           <div
             style={{
-              fontSize: 11.5,
+              fontSize: 11,
               color: "var(--fg-muted)",
               lineHeight: 1.45,
+              wordBreak: "break-word",
             }}
           >
             Synchronizes the entire repository and all submodules (
@@ -198,6 +207,7 @@ export const RightCommitInspector: React.FC = () => {
                         fontFamily: "var(--font-mono-stack)",
                         fontSize: 10.5,
                         color: "var(--fg-danger)",
+                        wordBreak: "break-all",
                       }}
                     >
                       Main dirty:{" "}
@@ -213,6 +223,7 @@ export const RightCommitInspector: React.FC = () => {
                         fontFamily: "var(--font-mono-stack)",
                         fontSize: 10.5,
                         color: "var(--fg-danger)",
+                        wordBreak: "break-all",
                       }}
                     >
                       Dirty submodules:{" "}
@@ -250,11 +261,18 @@ export const RightCommitInspector: React.FC = () => {
             </div>
           )}
 
-          <div style={{ display: "flex", gap: 6 }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "stretch",
+              gap: 6,
+            }}
+          >
             <button
               type="button"
               className="primer-btn primer-btn-primary"
-              style={{ flex: 1 }}
+              style={{ flex: "1 1 135px" }}
               disabled={isLoading || isCurrentHead || !isWorktreeClean}
               onClick={() => void runDetachedCheckout(selectedCommit.sha)}
             >
@@ -268,6 +286,7 @@ export const RightCommitInspector: React.FC = () => {
             <button
               type="button"
               className="primer-btn"
+              style={{ flex: "1 1 95px" }}
               onClick={() =>
                 void updateLocalBaseRef(
                   selectedCommit.refs[0]?.replace(/^HEAD -> /, "") ??
@@ -287,10 +306,17 @@ export const RightCommitInspector: React.FC = () => {
       <div className="primer-box">
         <div
           className="primer-box-header"
-          style={{ padding: "8px 12px", fontSize: 12 }}
+          style={{ padding: "7px 10px", fontSize: 11.5 }}
         >
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <GitCommit size={13} />
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 5,
+              minWidth: 0,
+            }}
+          >
+            <GitCommit size={13} style={{ flexShrink: 0 }} />
             <span>Commit Message &amp; Metadata</span>
           </span>
           <span
@@ -306,7 +332,7 @@ export const RightCommitInspector: React.FC = () => {
         <div
           className="primer-box-body"
           style={{
-            padding: 10,
+            padding: 8,
             display: "flex",
             flexDirection: "column",
             gap: 8,
@@ -315,7 +341,7 @@ export const RightCommitInspector: React.FC = () => {
           <div
             style={{
               fontWeight: 600,
-              fontSize: 12.5,
+              fontSize: 12,
               lineHeight: 1.45,
               wordBreak: "break-word",
             }}
@@ -345,7 +371,7 @@ export const RightCommitInspector: React.FC = () => {
 
           <div
             className="primer-readonly-field"
-            style={{ fontFamily: "var(--font-mono-stack)", fontSize: 11 }}
+            style={{ fontFamily: "var(--font-mono-stack)", fontSize: 10.5 }}
           >
             {selectedCommit.sha}
           </div>
@@ -353,9 +379,11 @@ export const RightCommitInspector: React.FC = () => {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "82px 1fr",
+              gridTemplateColumns: "72px minmax(0, 1fr)",
               rowGap: 4,
-              fontSize: 11.5,
+              columnGap: 6,
+              fontSize: 11,
+              wordBreak: "break-word",
             }}
           >
             <span style={{ color: "var(--fg-muted)" }}>Author:</span>
@@ -365,7 +393,7 @@ export const RightCommitInspector: React.FC = () => {
               {formatRelativeOrShortTime(selectedCommit.timestamp)} UTC
             </span>
             <span style={{ color: "var(--fg-muted)" }}>Role:</span>
-            <span style={{ fontWeight: 600, fontSize: 11 }}>
+            <span style={{ fontWeight: 600, fontSize: 10.5 }}>
               {formatDivergenceDescription(selectedRow?.divergenceKind)}
             </span>
           </div>
@@ -383,7 +411,7 @@ export const RightCommitInspector: React.FC = () => {
               Parent Lineage ({selectedCommit.parents.length})
             </div>
             {selectedCommit.parents.length === 0 ? (
-              <div style={{ fontSize: 11.5, color: "var(--fg-muted)" }}>
+              <div style={{ fontSize: 11, color: "var(--fg-muted)" }}>
                 Root / Orphan Initial Commit (0 parents)
               </div>
             ) : (
@@ -411,8 +439,9 @@ export const RightCommitInspector: React.FC = () => {
                         <div
                           style={{
                             display: "flex",
+                            flexWrap: "wrap",
                             alignItems: "center",
-                            gap: 6,
+                            gap: 5,
                           }}
                         >
                           <span
@@ -495,8 +524,9 @@ export const RightCommitInspector: React.FC = () => {
                         <div
                           style={{
                             display: "flex",
+                            flexWrap: "wrap",
                             alignItems: "center",
-                            gap: 6,
+                            gap: 5,
                           }}
                         >
                           <span
@@ -548,19 +578,24 @@ export const RightCommitInspector: React.FC = () => {
         <div className="primer-box">
           <div
             className="primer-box-header"
-            style={{ padding: "8px 12px", fontSize: 12 }}
+            style={{ padding: "7px 10px", fontSize: 11.5 }}
           >
             <span
-              style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                minWidth: 0,
+              }}
             >
-              <Box size={13} />
+              <Box size={13} style={{ flexShrink: 0 }} />
               <span>Submodule Pointers at {selectedCommit.shortSha}</span>
             </span>
           </div>
           <div
             className="primer-box-body"
             style={{
-              padding: 10,
+              padding: 8,
               display: "flex",
               flexDirection: "column",
               gap: 6,
@@ -575,20 +610,23 @@ export const RightCommitInspector: React.FC = () => {
                   <div
                     key={subPath}
                     style={{
-                      padding: "7px 9px",
+                      padding: "7px 8px",
                       borderRadius: 6,
                       border: "1px solid var(--border-default)",
                       backgroundColor: "var(--bg-canvas-subtle)",
                       display: "flex",
                       flexDirection: "column",
                       gap: 5,
+                      minWidth: 0,
                     }}
                   >
                     <div
                       style={{
                         display: "flex",
+                        flexWrap: "wrap",
                         alignItems: "center",
                         justifyContent: "space-between",
+                        gap: 4,
                       }}
                     >
                       <span
@@ -596,6 +634,7 @@ export const RightCommitInspector: React.FC = () => {
                           fontWeight: 600,
                           fontSize: 11.5,
                           fontFamily: "var(--font-mono-stack)",
+                          wordBreak: "break-all",
                         }}
                       >
                         {subPath}
@@ -609,17 +648,25 @@ export const RightCommitInspector: React.FC = () => {
                     <div
                       style={{
                         fontFamily: "var(--font-mono-stack)",
-                        fontSize: 11,
+                        fontSize: 10.5,
                         color: "var(--fg-accent)",
                         wordBreak: "break-all",
                       }}
                     >
                       {subSha}
                     </div>
-                    <div style={{ display: "flex", gap: 6 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        alignItems: "stretch",
+                        gap: 5,
+                      }}
+                    >
                       <button
                         type="button"
                         className="primer-btn primer-card-action-btn"
+                        style={{ flex: "1 1 115px" }}
                         onClick={() =>
                           void loadRepositoryByPath(fullSubPath, true)
                         }
@@ -630,6 +677,7 @@ export const RightCommitInspector: React.FC = () => {
                       <button
                         type="button"
                         className="primer-btn primer-card-action-btn"
+                        style={{ flex: "1 1 95px" }}
                         onClick={() => void openDirectoryInOs(fullSubPath)}
                       >
                         <FolderOpen size={11} />
@@ -648,10 +696,17 @@ export const RightCommitInspector: React.FC = () => {
       <div className="primer-box">
         <div
           className="primer-box-header"
-          style={{ padding: "8px 12px", fontSize: 12 }}
+          style={{ padding: "7px 10px", fontSize: 11.5 }}
         >
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <Tag size={13} />
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 5,
+              minWidth: 0,
+            }}
+          >
+            <Tag size={13} style={{ flexShrink: 0 }} />
             <span>Local Commit Tag &amp; Note (Local-Only)</span>
           </span>
           {savedNotice && (
@@ -662,7 +717,7 @@ export const RightCommitInspector: React.FC = () => {
           onSubmit={(e) => void handleSaveAnnotation(e)}
           className="primer-box-body"
           style={{
-            padding: 10,
+            padding: 8,
             display: "flex",
             flexDirection: "column",
             gap: 8,
@@ -677,7 +732,7 @@ export const RightCommitInspector: React.FC = () => {
               setTagLabel(e.target.value);
               setSavedNotice(false);
             }}
-            style={{ fontSize: 12 }}
+            style={{ fontSize: 11.5 }}
           />
 
           <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
@@ -715,11 +770,18 @@ export const RightCommitInspector: React.FC = () => {
             }}
           />
 
-          <div style={{ display: "flex", gap: 6 }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "stretch",
+              gap: 6,
+            }}
+          >
             <button
               type="submit"
               className="primer-btn primer-btn-primary"
-              style={{ flex: 1 }}
+              style={{ flex: "1 1 110px" }}
             >
               Save Local Tag
             </button>
@@ -727,6 +789,7 @@ export const RightCommitInspector: React.FC = () => {
               <button
                 type="button"
                 className="primer-btn primer-btn-danger"
+                style={{ flex: "1 1 70px" }}
                 onClick={() => void handleClearAnnotation()}
               >
                 Clear
