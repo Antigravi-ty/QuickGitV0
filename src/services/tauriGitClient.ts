@@ -2,10 +2,12 @@ import { invoke } from "@tauri-apps/api/core";
 import {
   DEFAULT_ORPHAN_HORIZON_COMMIT_LIMIT,
   DEMO_ROCKET_COMPANION_SNAPSHOT,
+  ROCKET_COMPANION_DEFAULT_ANNOTATIONS,
 } from "../config/demoRepositorySnapshot";
 import {
   AnnotationTone,
   AppWorkspaceMetadata,
+  CommitTriageStatus,
   DetachedCheckoutOutcome,
   RepositoryLocalMetadata,
   RepositorySnapshot,
@@ -22,38 +24,36 @@ export function isTauriDesktopRuntime(): boolean {
 }
 
 function loadBrowserFallbackMetadata(): AppWorkspaceMetadata {
+  const demoPath = DEMO_ROCKET_COMPANION_SNAPSHOT.repoPath;
   try {
     const raw = localStorage.getItem(BROWSER_FALLBACK_STORAGE_KEY);
     if (raw) {
-      return JSON.parse(raw) as AppWorkspaceMetadata;
+      const parsed = JSON.parse(raw) as AppWorkspaceMetadata;
+      const demoRepo = parsed.repositories?.[demoPath];
+      if (demoRepo) {
+        for (const [sha, defaultAnn] of Object.entries(
+          ROCKET_COMPANION_DEFAULT_ANNOTATIONS
+        )) {
+          if (!demoRepo.commitAnnotations[sha]) {
+            demoRepo.commitAnnotations[sha] = { ...defaultAnn };
+          }
+        }
+      }
+      return parsed;
     }
   } catch (_) {}
-  const demoPath = DEMO_ROCKET_COMPANION_SNAPSHOT.repoPath;
   return {
     recentRepositories: [demoPath],
     activeRepositoryPath: demoPath,
     repositories: {
       [demoPath]: {
         repoPath: demoPath,
-        localBaseRef: "z/merge-nametag-freeplay-trail-and-training-cam",
+        localBaseRef: null,
         orphanHorizonCommitLimit: DEFAULT_ORPHAN_HORIZON_COMMIT_LIMIT,
         showArchivedOrphanTrees: false,
         includeLocalStaleBranches: false,
         commitAnnotations: {
-          "0370bf1897bfb0fc842ea288dc3dda0ac7b5338f": {
-            commitSha: "0370bf1897bfb0fc842ea288dc3dda0ac7b5338f",
-            tagLabel: "Gen-3 Radar WS Merge",
-            colorTone: "success",
-            note: "Unified WS1 + WS4 + WS5 with RCUIModule 4c07185",
-            updatedAt: 1793939500,
-          },
-          "07414349c40563fc0432bfe973de7f716a85bc4f": {
-            commitSha: "07414349c40563fc0432bfe973de7f716a85bc4f",
-            tagLabel: "Trail + Freeplay Candidate",
-            colorTone: "sponsors",
-            note: "3-way merge of NameTag, Freeplay decouple, and Supersonic Trail",
-            updatedAt: 1793939320,
-          },
+          ...ROCKET_COMPANION_DEFAULT_ANNOTATIONS,
         },
       },
     },
@@ -214,21 +214,54 @@ export async function saveCommitAnnotation(params: {
   tagLabel: string;
   colorTone: AnnotationTone;
   note: string;
+  confirmed?: boolean;
+  triageStatus?: CommitTriageStatus;
+  linkedCommitSha?: string;
 }): Promise<AppWorkspaceMetadata> {
+  const normalizedStatus = params.triageStatus;
+  const normalizedLinked = params.linkedCommitSha?.trim() || undefined;
+  const isConfirmed =
+    params.confirmed ??
+    Boolean(
+      (normalizedStatus && normalizedStatus !== "unconfirmed") ||
+        normalizedLinked ||
+        params.tagLabel.trim()
+    );
+
   if (isTauriDesktopRuntime()) {
-    return invoke<AppWorkspaceMetadata>("save_commit_annotation_cmd", params);
-  }
-  const meta = loadBrowserFallbackMetadata();
-  const entry = ensureFallbackRepoEntry(meta, params.repoPath);
-  if (!params.tagLabel.trim() && !params.note.trim()) {
-    delete entry.commitAnnotations[params.commitSha];
-  } else {
-    entry.commitAnnotations[params.commitSha] = {
+    return invoke<AppWorkspaceMetadata>("save_commit_annotation_cmd", {
+      repoPath: params.repoPath,
       commitSha: params.commitSha,
       tagLabel: params.tagLabel,
       colorTone: params.colorTone,
       note: params.note,
+      confirmed: isConfirmed,
+      triageStatus: normalizedStatus ?? null,
+      linkedCommitSha: normalizedLinked ?? null,
+    });
+  }
+  const meta = loadBrowserFallbackMetadata();
+  const entry = ensureFallbackRepoEntry(meta, params.repoPath);
+  const hasMeaningfulStatus =
+    normalizedStatus && normalizedStatus !== "unconfirmed";
+  if (
+    !isConfirmed &&
+    !hasMeaningfulStatus &&
+    !normalizedLinked &&
+    !params.tagLabel.trim() &&
+    !params.note.trim()
+  ) {
+    delete entry.commitAnnotations[params.commitSha];
+  } else {
+    entry.commitAnnotations[params.commitSha] = {
+      commitSha: params.commitSha,
+      tagLabel: params.tagLabel.trim(),
+      colorTone: params.colorTone,
+      note: params.note.trim(),
       updatedAt: Math.floor(Date.now() / 1000),
+      confirmed: isConfirmed,
+      triageStatus: normalizedStatus,
+      linkedCommitSha: normalizedLinked,
     };
   }
   saveBrowserFallbackMetadata(meta);

@@ -201,12 +201,29 @@ pub fn save_commit_annotation_cmd(
     tag_label: String,
     color_tone: String,
     note: String,
+    confirmed: Option<bool>,
+    triage_status: Option<String>,
+    linked_commit_sha: Option<String>,
 ) -> Result<AppWorkspaceMetadata, String> {
     let mut workspace = load_workspace_metadata(&app);
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map(|d| d.as_secs() as i64)
         .unwrap_or(0);
+    let normalized_status = triage_status
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
+    let normalized_linked = linked_commit_sha
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
+    let is_confirmed = confirmed.unwrap_or_else(|| {
+        normalized_status
+            .as_deref()
+            .map(|s| s != "unconfirmed")
+            .unwrap_or(false)
+            || normalized_linked.is_some()
+            || !tag_label.trim().is_empty()
+    });
     upsert_commit_annotation(
         &mut workspace,
         &repo_path,
@@ -216,6 +233,9 @@ pub fn save_commit_annotation_cmd(
             color_tone,
             note,
             updated_at: now,
+            confirmed: is_confirmed,
+            triage_status: normalized_status,
+            linked_commit_sha: normalized_linked,
         },
     );
     save_workspace_metadata(&app, &workspace)?;

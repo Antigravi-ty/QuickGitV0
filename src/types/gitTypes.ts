@@ -80,12 +80,35 @@ export interface DetachedCheckoutOutcome {
   workingTreeStatus: WorkingTreeGuardStatus;
 }
 
+export type CommitTriageStatus =
+  | "unconfirmed"
+  | "useful"
+  | "useless"
+  | "absorbed"
+  | "hold";
+
+export type TopologyFilterCategory =
+  | "all"
+  | "mainline"
+  | "unmerged_all"
+  | "unmerged_tip"
+  | "unconfirmed"
+  | "multi_merged"
+  | "submodule_bump";
+
+export type TimezoneDisplayMode = "utc8" | "utc0" | "local";
+
+export type LineageDepthMode = "unmerged_cluster" | "1_hop" | "2_hops";
+
 export interface LocalCommitAnnotation {
   commitSha: string;
   tagLabel: string;
   colorTone: AnnotationTone;
   note: string;
   updatedAt: number;
+  confirmed?: boolean;
+  triageStatus?: CommitTriageStatus;
+  linkedCommitSha?: string;
 }
 
 export interface RepositoryLocalMetadata {
@@ -157,6 +180,13 @@ export interface PositionedCommitRow {
   childShas: string[];
   mergeSourceLabels: string[];
   componentId: string;
+}
+
+export interface UnmergedClusterSummary {
+  clusterShas: string[];
+  tipRows: PositionedCommitRow[];
+  internalRows: PositionedCommitRow[];
+  baseBoundaryRows: PositionedCommitRow[];
 }
 
 export interface ComputedTopologyLayout {

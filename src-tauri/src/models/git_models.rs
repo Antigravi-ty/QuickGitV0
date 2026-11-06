@@ -98,6 +98,12 @@ pub struct LocalCommitAnnotation {
     pub color_tone: String,
     pub note: String,
     pub updated_at: i64,
+    #[serde(default)]
+    pub confirmed: bool,
+    #[serde(default)]
+    pub triage_status: Option<String>,
+    #[serde(default)]
+    pub linked_commit_sha: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]

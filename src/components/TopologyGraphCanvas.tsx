@@ -3,6 +3,7 @@ import {
   Box,
   CloudOff,
   GitMerge,
+  Link2,
   Maximize2,
   Play,
   Tag,
@@ -12,14 +13,26 @@ import {
   TopologyFilterCategory,
   useRepositoryStore,
 } from "../stores/repositoryStore";
-import { GraphEdgeSegment, PositionedCommitRow } from "../types/gitTypes";
-import { formatRelativeOrShortTime, stripRemotePrefix } from "../utils/formatters";
+import {
+  GraphEdgeSegment,
+  LocalCommitAnnotation,
+  PositionedCommitRow,
+} from "../types/gitTypes";
+import {
+  formatRelativeOrShortTime,
+  formatTimezoneBadgeLabel,
+  isCommitTipConfirmed,
+  resolveTriageBadgeSpec,
+  stripRemotePrefix,
+} from "../utils/formatters";
+import { computeCommitLineageAndCluster } from "../utils/topologyGraphPipeline";
 
 const ROW_HEIGHT = 36;
 const LANE_SPACING = 16;
 const GRAPH_PADDING_LEFT = 16;
 const VIRTUAL_OVERSCAN_ROWS = 18;
 const MERGED_MUTED_STROKE = "#8b949e";
+const EQUAL_TYPE_BADGE_WIDTH = 96;
 
 function laneToX(laneIndex: number): number {
   return GRAPH_PADDING_LEFT + laneIndex * LANE_SPACING;
@@ -71,17 +84,25 @@ function buildDiagonalCurvePath(edge: GraphEdgeSegment): string {
 function isRowHighlightedByCategory(
   row: PositionedCommitRow,
   category: TopologyFilterCategory,
-  focusedSubmodulePath: string | null
+  focusedSubmodulePath: string | null,
+  annotations: Record<string, LocalCommitAnnotation>
 ): boolean {
   switch (category) {
     case "all":
       return true;
     case "mainline":
       return row.divergenceKind === "mainline";
-    case "unmerged_tip":
+    case "unmerged_all":
       return (
         row.divergenceKind === "unmerged_tip" ||
         row.divergenceKind === "diverged"
+      );
+    case "unmerged_tip":
+      return row.divergenceKind === "unmerged_tip";
+    case "unconfirmed":
+      return (
+        row.divergenceKind === "unmerged_tip" &&
+        !isCommitTipConfirmed(annotations[row.commit.sha])
       );
     case "multi_merged":
       return row.isMergeCommit || row.isMultiMergeTarget;
@@ -103,6 +124,11 @@ export const TopologyGraphCanvas: React.FC = () => {
     (s) => s.focusedSubmodulePath
   );
   const focusLineageOnly = useRepositoryStore((s) => s.focusLineageOnly);
+  const lineageDepthMode = useRepositoryStore((s) => s.lineageDepthMode);
+  const timezoneMode = useRepositoryStore((s) => s.timezoneMode);
+  const showMergeSourcePills = useRepositoryStore(
+    (s) => s.showMergeSourcePills
+  );
   const selectCommit = useRepositoryStore((s) => s.selectCommit);
   const runDetachedCheckout = useRepositoryStore((s) => s.runDetachedCheckout);
 
@@ -115,9 +141,9 @@ export const TopologyGraphCanvas: React.FC = () => {
   const [manualGraphColWidth, setManualGraphColWidth] = useState<number | null>(
     null
   );
-  const [shaColWidth] = useState(86);
+  const [shaColWidth] = useState(96);
   const [submoduleColWidth, setSubmoduleColWidth] = useState(145);
-  const [dateColWidth] = useState(118);
+  const [dateColWidth] = useState(124);
 
   const columnOffsetsRef = useRef({
     lanes: 0,
@@ -216,34 +242,70 @@ export const TopologyGraphCanvas: React.FC = () => {
     []
   );
 
-  const rowBySha = useMemo(() => {
-    const map = new Map<string, PositionedCommitRow>();
+  const annotations = useMemo(() => {
+    if (!snapshot) {
+      return {};
+    }
+    return workspaceMeta.repositories[snapshot.repoPath]?.commitAnnotations ?? {};
+  }, [workspaceMeta, snapshot]);
+
+  const reverseLinkedFromMap = useMemo(() => {
+    const map = new Map<string, string[]>();
     if (!layout) {
       return map;
     }
-    for (const r of layout.rows) {
-      map.set(r.commit.sha, r);
+    for (const [sourceSha, ann] of Object.entries(annotations)) {
+      const targetRef = ann.linkedCommitSha?.trim().toLowerCase();
+      if (!targetRef) {
+        continue;
+      }
+      for (const r of layout.rows) {
+        if (
+          r.commit.sha.toLowerCase() === targetRef ||
+          r.commit.sha.toLowerCase().startsWith(targetRef)
+        ) {
+          const list = map.get(r.commit.sha) ?? [];
+          list.push(sourceSha);
+          map.set(r.commit.sha, list);
+        }
+      }
     }
     return map;
-  }, [layout]);
+  }, [annotations, layout]);
 
-  const focusedConnectedShas = useMemo(() => {
-    const set = new Set<string>();
-    if (!selectedCommitSha || !layout) {
-      return set;
+  const { focusedConnectedShas } = useMemo(
+    () =>
+      computeCommitLineageAndCluster({
+        layout,
+        selectedCommitSha,
+        lineageDepthMode,
+        annotations,
+      }),
+    [layout, selectedCommitSha, lineageDepthMode, annotations]
+  );
+
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el || !layout || !selectedCommitSha) {
+      return;
     }
-    set.add(selectedCommitSha);
-    const selectedRow = rowBySha.get(selectedCommitSha);
-    if (selectedRow) {
-      for (const p of selectedRow.commit.parents) {
-        set.add(p);
-      }
-      for (const c of selectedRow.childShas) {
-        set.add(c);
-      }
+    const targetRow = layout.rows.find(
+      (r) => r.commit.sha === selectedCommitSha
+    );
+    if (!targetRow) {
+      return;
     }
-    return set;
-  }, [selectedCommitSha, layout, rowBySha]);
+    const targetTop = targetRow.rowIndex * ROW_HEIGHT;
+    const targetBottom = targetTop + ROW_HEIGHT;
+    const viewTop = el.scrollTop;
+    const viewBottom = viewTop + el.clientHeight;
+    if (targetTop < viewTop + ROW_HEIGHT || targetBottom > viewBottom - ROW_HEIGHT) {
+      el.scrollTo({
+        top: Math.max(0, targetTop - el.clientHeight / 3),
+        behavior: "smooth",
+      });
+    }
+  }, [selectedCommitSha, layout]);
 
   if (!snapshot || !layout) {
     return (
@@ -253,9 +315,6 @@ export const TopologyGraphCanvas: React.FC = () => {
       </div>
     );
   }
-
-  const annotations =
-    workspaceMeta.repositories[snapshot.repoPath]?.commitAnnotations ?? {};
 
   const autoGraphWidth = Math.max(
     115,
@@ -279,12 +338,24 @@ export const TopologyGraphCanvas: React.FC = () => {
     (edge) => edge.toRow >= visibleStartRow && edge.fromRow <= visibleEndRow
   );
 
+  const baseTypeBadgeStyle: React.CSSProperties = {
+    width: EQUAL_TYPE_BADGE_WIDTH,
+    minWidth: EQUAL_TYPE_BADGE_WIDTH,
+    maxWidth: EQUAL_TYPE_BADGE_WIDTH,
+    justifyContent: "center",
+    textAlign: "center",
+    flexShrink: 0,
+    boxSizing: "border-box",
+    padding: "1px 4px",
+  };
+
   const renderDivergenceBadge = (row: PositionedCommitRow) => {
     switch (row.divergenceKind) {
       case "mainline":
         return (
           <span
             className="primer-label primer-label-accent"
+            style={baseTypeBadgeStyle}
             title="On the selected Local Visual Base first-parent spine"
           >
             MAINLINE
@@ -294,6 +365,7 @@ export const TopologyGraphCanvas: React.FC = () => {
         return (
           <span
             className="primer-label primer-label-attention"
+            style={baseTypeBadgeStyle}
             title="Unmerged branch head (tip) relative to the selected Local Base"
           >
             UNMERGED TIP
@@ -303,6 +375,7 @@ export const TopologyGraphCanvas: React.FC = () => {
         return (
           <span
             className="primer-label primer-label-severe"
+            style={baseTypeBadgeStyle}
             title="Unmerged commit along an unmerged branch below its tip (not yet merged into Local Base)"
           >
             UNMERGED
@@ -312,6 +385,7 @@ export const TopologyGraphCanvas: React.FC = () => {
         return (
           <span
             className="primer-label primer-label-danger"
+            style={baseTypeBadgeStyle}
             title="Belongs to a disconnected orphan history root tree"
           >
             ORPHAN
@@ -323,7 +397,7 @@ export const TopologyGraphCanvas: React.FC = () => {
           <span
             className="primer-label primer-label-neutral"
             title="Already merged into the selected Local Visual Base"
-            style={{ opacity: 0.75 }}
+            style={{ ...baseTypeBadgeStyle, opacity: 0.78 }}
           >
             MERGED
           </span>
@@ -532,7 +606,7 @@ export const TopologyGraphCanvas: React.FC = () => {
             alignItems: "center",
           }}
         >
-          Date (UTC)
+          Date ({formatTimezoneBadgeLabel(timezoneMode)})
         </div>
 
         {/* Quick State Checkout Header */}
@@ -612,6 +686,11 @@ export const TopologyGraphCanvas: React.FC = () => {
                   (edge.fromSha === selectedCommitSha ||
                     edge.toSha === selectedCommitSha);
 
+                const isInFocusedCluster =
+                  selectedCommitSha !== null &&
+                  focusedConnectedShas.has(edge.fromSha) &&
+                  focusedConnectedShas.has(edge.toSha);
+
                 const matchesCategory =
                   filterCategory === "all"
                     ? true
@@ -619,19 +698,22 @@ export const TopologyGraphCanvas: React.FC = () => {
                         isRowHighlightedByCategory(
                           sourceRow,
                           filterCategory,
-                          focusedSubmodulePath
+                          focusedSubmodulePath,
+                          annotations
                         )) ||
                       (targetRow &&
                         isRowHighlightedByCategory(
                           targetRow,
                           filterCategory,
-                          focusedSubmodulePath
+                          focusedSubmodulePath,
+                          annotations
                         ));
 
                 const isAlreadyMerged =
                   edge.isMergedIntoBase &&
                   filterCategory !== "multi_merged" &&
-                  !isDirectToSelected;
+                  !isDirectToSelected &&
+                  !(focusLineageOnly && isInFocusedCluster);
 
                 const strokeColor = isAlreadyMerged
                   ? MERGED_MUTED_STROKE
@@ -654,9 +736,9 @@ export const TopologyGraphCanvas: React.FC = () => {
                 }
 
                 if (focusLineageOnly && selectedCommitSha) {
-                  if (isDirectToSelected) {
+                  if (isDirectToSelected || isInFocusedCluster) {
                     opacity = 1;
-                    strokeWidth = 2.7;
+                    strokeWidth = isDirectToSelected ? 2.7 : 2.35;
                   } else {
                     opacity = 0.12;
                   }
@@ -692,7 +774,8 @@ export const TopologyGraphCanvas: React.FC = () => {
                 const matchesCategory = isRowHighlightedByCategory(
                   row,
                   filterCategory,
-                  focusedSubmodulePath
+                  focusedSubmodulePath,
+                  annotations
                 );
                 const isMergedNode =
                   row.divergenceKind === "merged" &&
@@ -773,10 +856,16 @@ export const TopologyGraphCanvas: React.FC = () => {
             const isSelected = commit.sha === selectedCommitSha;
             const isHead = commit.sha === snapshot.headSha;
             const annotation = annotations[commit.sha];
+            const isConfirmedTip = isCommitTipConfirmed(annotation);
+            const triageBadge = resolveTriageBadgeSpec(annotation);
+            const reverseLinkedShas =
+              reverseLinkedFromMap.get(commit.sha) ?? [];
+
             const matchesCategory = isRowHighlightedByCategory(
               row,
               filterCategory,
-              focusedSubmodulePath
+              focusedSubmodulePath,
+              annotations
             );
             const isLineageDimmed =
               focusLineageOnly &&
@@ -797,7 +886,20 @@ export const TopologyGraphCanvas: React.FC = () => {
               rowFilter = "grayscale(0.65)";
             }
 
+            const deduplicatedRefs: string[] = [];
+            for (const rawRef of commit.refs) {
+              const stripped = stripRemotePrefix(rawRef);
+              if (
+                stripped &&
+                stripped !== "HEAD" &&
+                !deduplicatedRefs.includes(stripped)
+              ) {
+                deduplicatedRefs.push(stripped);
+              }
+            }
             const staleRefs = commit.staleRefs ?? [];
+            const sha8 = commit.sha.slice(0, 8);
+            const isMainlineCommit = row.divergenceKind === "mainline";
 
             return (
               <div
@@ -857,70 +959,29 @@ export const TopologyGraphCanvas: React.FC = () => {
                       willChange: "transform",
                     }}
                   >
-                    {isHead && (
-                      <span className="primer-label primer-label-success">
-                        HEAD
-                      </span>
-                    )}
-
+                    {/* 1. Fixed Equal-Width Divergence / Type Badge */}
                     {renderDivergenceBadge(row)}
 
-                    {/* Local User Tag Badge */}
-                    {annotation?.tagLabel && (
+                    {/* 2. Branch Name Pills (Aligned immediately after equal-width Type badge) */}
+                    {deduplicatedRefs.slice(0, 3).map((branchName) => (
                       <span
-                        className={`primer-label primer-label-${annotation.colorTone}`}
-                        title={annotation.note || "Local-only commit tag"}
-                      >
-                        <Tag size={10} />
-                        <span>{annotation.tagLabel}</span>
-                      </span>
-                    )}
-
-                    {/* Multi-branch Fan-Out Badge */}
-                    {row.isMultiMergeTarget && (
-                      <span
-                        className="primer-label primer-label-sponsors"
-                        title={`Shared base merged into ${row.mergedIntoCount} separate merge commits`}
-                      >
-                        Merged x{row.mergedIntoCount}
-                      </span>
-                    )}
-
-                    {/* Explicit Merge Source Pill */}
-                    {row.isMergeCommit && row.mergeSourceLabels.length > 0 && (
-                      <span
-                        className="primer-label primer-label-done"
-                        title={`Merge parents: ${row.mergeSourceLabels.join(
-                          ", "
-                        )}`}
-                      >
-                        <GitMerge size={10} />
-                        <span>
-                          Merge &lt;-{" "}
-                          {row.mergeSourceLabels.slice(0, 2).join(", ")}
-                          {row.mergeSourceLabels.length > 2
-                            ? ` +${row.mergeSourceLabels.length - 2}`
-                            : ""}
-                        </span>
-                      </span>
-                    )}
-
-                    {/* Live Origin Git Ref Pills */}
-                    {commit.refs.slice(0, 3).map((refName) => (
-                      <span
-                        key={refName}
+                        key={branchName}
                         className="primer-label primer-label-accent"
-                        title={`Live on origin: ${refName}`}
+                        style={{
+                          fontFamily: "var(--font-mono-stack)",
+                          fontWeight: 600,
+                        }}
+                        title={`Branch on origin: ${branchName}`}
                       >
-                        {stripRemotePrefix(refName)}
+                        {branchName}
                       </span>
                     ))}
-                    {commit.refs.length > 3 && (
+                    {deduplicatedRefs.length > 3 && (
                       <span
                         className="primer-label primer-label-neutral"
-                        title={commit.refs.join(", ")}
+                        title={deduplicatedRefs.join(", ")}
                       >
-                        +{commit.refs.length - 3} origin refs
+                        +{deduplicatedRefs.length - 3} refs
                       </span>
                     )}
 
@@ -932,6 +993,7 @@ export const TopologyGraphCanvas: React.FC = () => {
                         style={{
                           opacity: 0.62,
                           borderStyle: "dashed",
+                          fontFamily: "var(--font-mono-stack)",
                         }}
                         title={`Local / Unpruned ref (deleted on remote origin): ${staleRef}`}
                       >
@@ -949,6 +1011,91 @@ export const TopologyGraphCanvas: React.FC = () => {
                       </span>
                     )}
 
+                    {/* 3. HEAD Badge (Placed after branch name to preserve leading alignment) */}
+                    {isHead && (
+                      <span className="primer-label primer-label-success">
+                        HEAD
+                      </span>
+                    )}
+
+                    {/* 4. Local Tip Triage / Confirmation & Tag Badges (By SHA) */}
+                    {row.divergenceKind === "unmerged_tip" &&
+                      !isConfirmedTip && (
+                        <span
+                          className="primer-label primer-label-attention"
+                          style={{ borderStyle: "dashed" }}
+                          title="Unconfirmed unmerged tip: select this commit to confirm disposition (Useful, Useless, Absorbed, Hold) or assign a feature tag"
+                        >
+                          UNCONFIRMED
+                        </span>
+                      )}
+
+                    {triageBadge && (
+                      <span
+                        className={`primer-label primer-label-${triageBadge.tone}`}
+                        style={{
+                          cursor: annotation?.linkedCommitSha
+                            ? "pointer"
+                            : undefined,
+                        }}
+                        onClick={(e) => {
+                          if (annotation?.linkedCommitSha) {
+                            e.stopPropagation();
+                            const target = layout.rows.find((r) =>
+                              r.commit.sha.startsWith(
+                                annotation.linkedCommitSha ?? ""
+                              )
+                            );
+                            if (target) {
+                              selectCommit(target.commit.sha);
+                            }
+                          }
+                        }}
+                        title={
+                          annotation?.note ||
+                          (annotation?.linkedCommitSha
+                            ? `Click to jump to linked commit ${annotation.linkedCommitSha.slice(
+                                0,
+                                8
+                              )}`
+                            : "Confirmed local triage disposition")
+                        }
+                      >
+                        {annotation?.linkedCommitSha && <Link2 size={9} />}
+                        <span>{triageBadge.label}</span>
+                      </span>
+                    )}
+
+                    {annotation?.tagLabel && (
+                      <span
+                        className={`primer-label primer-label-${annotation.colorTone}`}
+                        title={annotation.note || "Local-only commit tag"}
+                      >
+                        <Tag size={10} />
+                        <span>{annotation.tagLabel}</span>
+                      </span>
+                    )}
+
+                    {reverseLinkedShas.map((sourceSha) => (
+                      <span
+                        key={sourceSha}
+                        className="primer-label primer-label-done"
+                        style={{ cursor: "pointer" }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          selectCommit(sourceSha);
+                        }}
+                        title={`Absorbed / linked from commit ${sourceSha.slice(
+                          0,
+                          8
+                        )} (click to jump)`}
+                      >
+                        <Link2 size={9} />
+                        <span>Linked &lt;- {sourceSha.slice(0, 8)}</span>
+                      </span>
+                    ))}
+
+                    {/* 5. Commit Subject */}
                     <span
                       style={{
                         fontSize: 12,
@@ -962,10 +1109,41 @@ export const TopologyGraphCanvas: React.FC = () => {
                     >
                       {commit.subject}
                     </span>
+
+                    {/* 6. Trailing Merge Multi-Target & Merge Source Pills (At the very end of the row) */}
+                    {row.isMultiMergeTarget && (
+                      <span
+                        className="primer-label primer-label-sponsors"
+                        style={{ minWidth: 74, justifyContent: "center" }}
+                        title={`Shared base merged into ${row.mergedIntoCount} separate merge commits`}
+                      >
+                        Merged x{row.mergedIntoCount}
+                      </span>
+                    )}
+
+                    {showMergeSourcePills &&
+                      row.isMergeCommit &&
+                      row.mergeSourceLabels.length > 0 && (
+                        <span
+                          className="primer-label primer-label-done"
+                          title={`Merge parents: ${row.mergeSourceLabels.join(
+                            ", "
+                          )}`}
+                        >
+                          <GitMerge size={10} />
+                          <span>
+                            Merge &lt;-{" "}
+                            {row.mergeSourceLabels.slice(0, 2).join(", ")}
+                            {row.mergeSourceLabels.length > 2
+                              ? ` +${row.mergeSourceLabels.length - 2}`
+                              : ""}
+                          </span>
+                        </span>
+                      )}
                   </div>
                 </div>
 
-                {/* Short SHA Column (Right next to Commit Title) */}
+                {/* Short SHA Column (Mainline enclosed in curly braces {SHA}) */}
                 <div
                   style={{
                     width: shaColWidth,
@@ -974,14 +1152,21 @@ export const TopologyGraphCanvas: React.FC = () => {
                     fontFamily: "var(--font-mono-stack)",
                     fontSize: 11.5,
                     fontWeight: 600,
-                    color: "var(--fg-accent)",
+                    color: isMainlineCommit
+                      ? "var(--fg-accent)"
+                      : "var(--fg-muted)",
                     borderRight: "1px solid var(--border-muted)",
                     height: "100%",
                     display: "flex",
                     alignItems: "center",
                   }}
+                  title={
+                    isMainlineCommit
+                      ? `Mainline Spine Commit: ${commit.sha}`
+                      : commit.sha
+                  }
                 >
-                  {commit.shortSha}
+                  {isMainlineCommit ? `{${sha8}}` : `\u00A0${sha8}\u00A0`}
                 </div>
 
                 {/* Horizontally Scrollable Submodules Column */}
@@ -1041,7 +1226,7 @@ export const TopologyGraphCanvas: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Date Column */}
+                {/* Date Column (Defaults to UTC+8) */}
                 <div
                   style={{
                     width: dateColWidth,
@@ -1057,7 +1242,7 @@ export const TopologyGraphCanvas: React.FC = () => {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {formatRelativeOrShortTime(commit.timestamp)}
+                  {formatRelativeOrShortTime(commit.timestamp, timezoneMode)}
                 </div>
 
                 {/* Detached Checkout Action */}
@@ -1073,7 +1258,7 @@ export const TopologyGraphCanvas: React.FC = () => {
                 >
                   {isHead ? (
                     <span className="primer-label primer-label-success">
-                      Current
+                      HEAD
                     </span>
                   ) : (
                     <button

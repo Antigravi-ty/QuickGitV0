@@ -1,5 +1,8 @@
 import { create } from "zustand";
-import { DEFAULT_ORPHAN_HORIZON_COMMIT_LIMIT } from "../config/demoRepositorySnapshot";
+import {
+  DEFAULT_ORPHAN_HORIZON_COMMIT_LIMIT,
+  ROCKET_COMPANION_DEFAULT_ANNOTATIONS,
+} from "../config/demoRepositorySnapshot";
 import {
   checkoutDetachedCommit,
   inspectRepository,
@@ -16,22 +19,24 @@ import {
 import {
   AnnotationTone,
   AppWorkspaceMetadata,
+  CommitTriageStatus,
   ComputedTopologyLayout,
   DetachedCheckoutOutcome,
+  LineageDepthMode,
   RepositorySnapshot,
+  TimezoneDisplayMode,
+  TopologyFilterCategory,
 } from "../types/gitTypes";
 import { computeTopologyLayout } from "../utils/topologyGraphPipeline";
 
-export type TopologyFilterCategory =
-  | "all"
-  | "mainline"
-  | "unmerged_tip"
-  | "multi_merged"
-  | "submodule_bump";
+export type { TopologyFilterCategory } from "../types/gitTypes";
 
 export type ColorThemeMode = "dark" | "light";
 
 const THEME_STORAGE_KEY = "quickgit_v0_theme_mode";
+const TIMEZONE_STORAGE_KEY = "quickgit_v0_timezone_mode";
+const SHOW_MERGE_PILLS_STORAGE_KEY = "quickgit_v0_show_merge_pills";
+const LINEAGE_DEPTH_STORAGE_KEY = "quickgit_v0_lineage_depth_mode";
 const LEFT_SIDEBAR_WIDTH_STORAGE_KEY = "quickgit_v0_left_sidebar_width";
 const RIGHT_SIDEBAR_WIDTH_STORAGE_KEY = "quickgit_v0_right_sidebar_width";
 
@@ -104,6 +109,49 @@ function resolveInitialTheme(): ColorThemeMode {
   return "light";
 }
 
+function resolveInitialTimezoneMode(): TimezoneDisplayMode {
+  if (typeof window !== "undefined") {
+    try {
+      const saved = localStorage.getItem(TIMEZONE_STORAGE_KEY);
+      if (saved === "utc8" || saved === "utc0" || saved === "local") {
+        return saved;
+      }
+    } catch (_) {}
+  }
+  return "utc8";
+}
+
+function resolveInitialShowMergePills(): boolean {
+  if (typeof window !== "undefined") {
+    try {
+      const saved = localStorage.getItem(SHOW_MERGE_PILLS_STORAGE_KEY);
+      if (saved === "false") {
+        return false;
+      }
+      if (saved === "true") {
+        return true;
+      }
+    } catch (_) {}
+  }
+  return true;
+}
+
+function resolveInitialLineageDepthMode(): LineageDepthMode {
+  if (typeof window !== "undefined") {
+    try {
+      const saved = localStorage.getItem(LINEAGE_DEPTH_STORAGE_KEY);
+      if (
+        saved === "unmerged_cluster" ||
+        saved === "1_hop" ||
+        saved === "2_hops"
+      ) {
+        return saved;
+      }
+    } catch (_) {}
+  }
+  return "unmerged_cluster";
+}
+
 interface RepositoryStoreState {
   workspaceMeta: AppWorkspaceMetadata;
   snapshot: RepositorySnapshot | null;
@@ -115,6 +163,9 @@ interface RepositoryStoreState {
   filterCategory: TopologyFilterCategory;
   focusedSubmodulePath: string | null;
   focusLineageOnly: boolean;
+  lineageDepthMode: LineageDepthMode;
+  timezoneMode: TimezoneDisplayMode;
+  showMergeSourcePills: boolean;
   isLoading: boolean;
   isSyncingOrigin: boolean;
   errorMessage: string | null;
@@ -145,7 +196,22 @@ interface RepositoryStoreState {
     tagLabel: string;
     colorTone: AnnotationTone;
     note: string;
+    confirmed?: boolean;
+    triageStatus?: CommitTriageStatus;
+    linkedCommitSha?: string;
   }) => Promise<void>;
+  batchUpdateCommitAnnotations: (
+    items: Array<{
+      commitSha: string;
+      tagLabel: string;
+      colorTone: AnnotationTone;
+      note: string;
+      confirmed?: boolean;
+      triageStatus?: CommitTriageStatus;
+      linkedCommitSha?: string;
+    }>
+  ) => Promise<void>;
+  applyRocketCompanionTriagePresets: () => Promise<void>;
   removeRepositoryFromRecent: (repoPath: string) => Promise<void>;
   runDetachedCheckout: (targetSha: string) => Promise<void>;
   clearCheckoutBanner: () => void;
@@ -153,6 +219,9 @@ interface RepositoryStoreState {
   setFilterCategory: (category: TopologyFilterCategory) => void;
   setFocusedSubmodulePath: (submodulePath: string | null) => void;
   toggleFocusLineageOnly: () => void;
+  setLineageDepthMode: (mode: LineageDepthMode) => void;
+  setTimezoneMode: (mode: TimezoneDisplayMode) => void;
+  setShowMergeSourcePills: (show: boolean) => void;
   toggleTheme: () => void;
   setLeftSidebarWidth: (width: number) => void;
   setRightSidebarWidth: (width: number) => void;
@@ -175,6 +244,7 @@ function recomputeCurrentLayout(
   const showArchivedOrphanTrees = repoMeta?.showArchivedOrphanTrees ?? false;
   const includeLocalStaleBranches =
     repoMeta?.includeLocalStaleBranches ?? false;
+  const commitAnnotations = repoMeta?.commitAnnotations ?? {};
 
   return computeTopologyLayout({
     snapshot,
@@ -185,6 +255,7 @@ function recomputeCurrentLayout(
     searchQuery,
     filterCategory,
     focusedSubmodulePath,
+    commitAnnotations,
   });
 }
 
@@ -203,6 +274,9 @@ export const useRepositoryStore = create<RepositoryStoreState>((set, get) => ({
   filterCategory: "all",
   focusedSubmodulePath: null,
   focusLineageOnly: false,
+  lineageDepthMode: resolveInitialLineageDepthMode(),
+  timezoneMode: resolveInitialTimezoneMode(),
+  showMergeSourcePills: resolveInitialShowMergePills(),
   isLoading: false,
   isSyncingOrigin: false,
   errorMessage: null,
@@ -459,7 +533,64 @@ export const useRepositoryStore = create<RepositoryStoreState>((set, get) => ({
       repoPath: snapshot.repoPath,
       ...params,
     });
-    set({ workspaceMeta });
+    const { searchQuery, filterCategory, focusedSubmodulePath } = get();
+    const layout =
+      searchQuery.trim().length > 0
+        ? recomputeCurrentLayout(
+            snapshot,
+            workspaceMeta,
+            searchQuery,
+            filterCategory,
+            focusedSubmodulePath
+          )
+        : get().layout;
+    set({ workspaceMeta, layout });
+  },
+
+  batchUpdateCommitAnnotations: async (items) => {
+    const snapshot = get().snapshot;
+    if (!snapshot || items.length === 0) {
+      return;
+    }
+    let latestMeta = get().workspaceMeta;
+    for (const item of items) {
+      latestMeta = await saveCommitAnnotation({
+        repoPath: snapshot.repoPath,
+        ...item,
+      });
+    }
+    const { searchQuery, filterCategory, focusedSubmodulePath } = get();
+    const layout =
+      searchQuery.trim().length > 0
+        ? recomputeCurrentLayout(
+            snapshot,
+            latestMeta,
+            searchQuery,
+            filterCategory,
+            focusedSubmodulePath
+          )
+        : get().layout;
+    set({ workspaceMeta: latestMeta, layout });
+  },
+
+  applyRocketCompanionTriagePresets: async () => {
+    const snapshot = get().snapshot;
+    if (!snapshot) {
+      return;
+    }
+    const commitSet = new Set(snapshot.commits.map((c) => c.sha));
+    const items = Object.values(ROCKET_COMPANION_DEFAULT_ANNOTATIONS)
+      .filter((ann) => commitSet.has(ann.commitSha))
+      .map((ann) => ({
+        commitSha: ann.commitSha,
+        tagLabel: ann.tagLabel,
+        colorTone: ann.colorTone,
+        note: ann.note,
+        confirmed: ann.confirmed,
+        triageStatus: ann.triageStatus,
+        linkedCommitSha: ann.linkedCommitSha,
+      }));
+    await get().batchUpdateCommitAnnotations(items);
   },
 
   removeRepositoryFromRecent: async (repoPath: string) => {
@@ -553,6 +684,30 @@ export const useRepositoryStore = create<RepositoryStoreState>((set, get) => ({
 
   toggleFocusLineageOnly: () => {
     set({ focusLineageOnly: !get().focusLineageOnly });
+  },
+
+  setLineageDepthMode: (lineageDepthMode: LineageDepthMode) => {
+    try {
+      localStorage.setItem(LINEAGE_DEPTH_STORAGE_KEY, lineageDepthMode);
+    } catch (_) {}
+    set({ lineageDepthMode });
+  },
+
+  setTimezoneMode: (timezoneMode: TimezoneDisplayMode) => {
+    try {
+      localStorage.setItem(TIMEZONE_STORAGE_KEY, timezoneMode);
+    } catch (_) {}
+    set({ timezoneMode });
+  },
+
+  setShowMergeSourcePills: (showMergeSourcePills: boolean) => {
+    try {
+      localStorage.setItem(
+        SHOW_MERGE_PILLS_STORAGE_KEY,
+        String(showMergeSourcePills)
+      );
+    } catch (_) {}
+    set({ showMergeSourcePills });
   },
 
   toggleTheme: () => {

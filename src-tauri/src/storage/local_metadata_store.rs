@@ -64,6 +64,93 @@ pub fn save_workspace_metadata(
     write_atomic_json(&path, &serialized)
 }
 
+fn build_default_rocket_companion_annotations() -> HashMap<String, LocalCommitAnnotation> {
+    let mut map = HashMap::new();
+    let presets = [
+        (
+            "003346382265f81146827e45c668eb291bdbe771",
+            "no-need-anymore",
+            "danger",
+            "Superseded by merge-five and merge-six; no longer needed.",
+            "useless",
+            None,
+        ),
+        (
+            "24f420ddf5a904a5fbff4b976a63b4bbe95ddacc",
+            "replay system",
+            "accent",
+            "Shared replay importer sync base for downstream replay system tips.",
+            "useful",
+            None,
+        ),
+        (
+            "aac86091a28687e94b1da67c53a48ceb7bc9cdb2",
+            "replay system",
+            "accent",
+            "Replay system tip (intervene + multi-car sync); pending replay cluster merge.",
+            "useful",
+            None,
+        ),
+        (
+            "96910e4da9f8276aedda1db25d5cb2ab74d27fb1",
+            "replay system",
+            "accent",
+            "Replay system tip (120Hz physics/boost timeline & intervene); merge with replay system cluster.",
+            "useful",
+            None,
+        ),
+        (
+            "31dca9f572cdb0e74b9da70feca638713f8107ce",
+            "replay system",
+            "accent",
+            "Replay system tip (wheel suspension droop & car hitboxes); merge with replay system cluster.",
+            "useful",
+            None,
+        ),
+        (
+            "a04997be7d8ec5ce3eece52c4b16972578e3390c",
+            "ui-plan-hold",
+            "attention",
+            "Selective RCUITuner 1b4c822 UI improvements; on hold pending newer UI plan.",
+            "hold",
+            None,
+        ),
+        (
+            "11eef892205e22701b597a70668040add3eb04df",
+            "absorbed-in-mainline",
+            "done",
+            "Name Tag aerial climb tracker & inward ring reworked and absorbed into mainline 6bd41edd.",
+            "absorbed",
+            Some("6bd41edd3700dec26783f73972326f93f15d490e"),
+        ),
+        (
+            "654b88228d86f0a65e805e498a2dcd21365cee2c",
+            "useful-needs-catchup",
+            "success",
+            "Useful pure module naming alignment; currently behind latest architecture and needs catch-up merge.",
+            "useful",
+            None,
+        ),
+    ];
+
+    for (sha, tag, tone, note, status, linked) in presets {
+        map.insert(
+            sha.to_string(),
+            LocalCommitAnnotation {
+                commit_sha: sha.to_string(),
+                tag_label: tag.to_string(),
+                color_tone: tone.to_string(),
+                note: note.to_string(),
+                updated_at: 1793961600,
+                confirmed: true,
+                triage_status: Some(status.to_string()),
+                linked_commit_sha: linked.map(|s| s.to_string()),
+            },
+        );
+    }
+    map
+}
+
 pub fn ensure_repo_entry<'a>(
     workspace: &'a mut AppWorkspaceMetadata,
     repo_path: &str,
@@ -75,6 +162,9 @@ pub fn ensure_repo_entry<'a>(
         workspace.recent_repositories.truncate(20);
     }
     workspace.active_repository_path = Some(normalized.clone());
+    let is_rocket_companion = normalized.ends_with("/RocketCompanion")
+        || normalized.ends_with("\\RocketCompanion")
+        || normalized == "RocketCompanion";
     workspace
         .repositories
         .entry(normalized.clone())
@@ -86,7 +176,11 @@ pub fn ensure_repo_entry<'a>(
             include_local_stale_branches: false,
             remote_live_refs: HashMap::new(),
             last_remote_sync_timestamp: None,
-            commit_annotations: HashMap::new(),
+            commit_annotations: if is_rocket_companion {
+                build_default_rocket_companion_annotations()
+            } else {
+                HashMap::new()
+            },
         })
 }
 
@@ -96,7 +190,22 @@ pub fn upsert_commit_annotation(
     annotation: LocalCommitAnnotation,
 ) {
     let entry = ensure_repo_entry(workspace, repo_path);
-    if annotation.tag_label.trim().is_empty() && annotation.note.trim().is_empty() {
+    let has_status = annotation
+        .triage_status
+        .as_deref()
+        .map(|s| !s.trim().is_empty() && s.trim() != "unconfirmed")
+        .unwrap_or(false);
+    let has_linked = annotation
+        .linked_commit_sha
+        .as_deref()
+        .map(|s| !s.trim().is_empty())
+        .unwrap_or(false);
+    if !annotation.confirmed
+        && !has_status
+        && !has_linked
+        && annotation.tag_label.trim().is_empty()
+        && annotation.note.trim().is_empty()
+    {
         entry.commit_annotations.remove(&annotation.commit_sha);
     } else {
         entry

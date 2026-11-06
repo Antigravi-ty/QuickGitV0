@@ -1,4 +1,9 @@
-import { AnnotationTone, RepositorySnapshot } from "../types/gitTypes";
+import {
+  AnnotationTone,
+  CommitTriageStatus,
+  LocalCommitAnnotation,
+  RepositorySnapshot,
+} from "../types/gitTypes";
 
 export const LANE_COLOR_PALETTE: readonly string[] = [
   "#0969da",
@@ -29,12 +34,129 @@ export const ANNOTATION_TONE_OPTIONS: readonly {
   { id: "sponsors", label: "Pink" },
 ];
 
+export const TRIAGE_STATUS_OPTIONS: readonly {
+  id: CommitTriageStatus;
+  label: string;
+  shortBadge: string;
+  defaultTone: AnnotationTone;
+}[] = [
+  {
+    id: "useful",
+    label: "Useful / Keep",
+    shortBadge: "USEFUL",
+    defaultTone: "success",
+  },
+  {
+    id: "useless",
+    label: "Useless / No Need",
+    shortBadge: "USELESS",
+    defaultTone: "danger",
+  },
+  {
+    id: "absorbed",
+    label: "Absorbed / Linked",
+    shortBadge: "ABSORBED",
+    defaultTone: "done",
+  },
+  {
+    id: "hold",
+    label: "On Hold / Outdated",
+    shortBadge: "ON HOLD",
+    defaultTone: "attention",
+  },
+  {
+    id: "unconfirmed",
+    label: "Unconfirmed",
+    shortBadge: "UNCONFIRMED",
+    defaultTone: "accent",
+  },
+];
+
+export const ROCKET_COMPANION_DEFAULT_ANNOTATIONS: Record<
+  string,
+  LocalCommitAnnotation
+> = {
+  "003346382265f81146827e45c668eb291bdbe771": {
+    commitSha: "003346382265f81146827e45c668eb291bdbe771",
+    tagLabel: "no-need-anymore",
+    colorTone: "danger",
+    note: "Superseded by merge-five and merge-six; no longer needed.",
+    updatedAt: 1793961600,
+    confirmed: true,
+    triageStatus: "useless",
+  },
+  "24f420ddf5a904a5fbff4b976a63b4bbe95ddacc": {
+    commitSha: "24f420ddf5a904a5fbff4b976a63b4bbe95ddacc",
+    tagLabel: "replay system",
+    colorTone: "accent",
+    note: "Shared replay importer sync base for downstream replay system tips.",
+    updatedAt: 1793961600,
+    confirmed: true,
+    triageStatus: "useful",
+  },
+  "aac86091a28687e94b1da67c53a48ceb7bc9cdb2": {
+    commitSha: "aac86091a28687e94b1da67c53a48ceb7bc9cdb2",
+    tagLabel: "replay system",
+    colorTone: "accent",
+    note: "Replay system tip (intervene + multi-car sync); pending replay cluster merge.",
+    updatedAt: 1793961600,
+    confirmed: true,
+    triageStatus: "useful",
+  },
+  "96910e4da9f8276aedda1db25d5cb2ab74d27fb1": {
+    commitSha: "96910e4da9f8276aedda1db25d5cb2ab74d27fb1",
+    tagLabel: "replay system",
+    colorTone: "accent",
+    note: "Replay system tip (120Hz physics/boost timeline & intervene); merge with replay system cluster.",
+    updatedAt: 1793961600,
+    confirmed: true,
+    triageStatus: "useful",
+  },
+  "31dca9f572cdb0e74b9da70feca638713f8107ce": {
+    commitSha: "31dca9f572cdb0e74b9da70feca638713f8107ce",
+    tagLabel: "replay system",
+    colorTone: "accent",
+    note: "Replay system tip (wheel suspension droop & car hitboxes); merge with replay system cluster.",
+    updatedAt: 1793961600,
+    confirmed: true,
+    triageStatus: "useful",
+  },
+  "a04997be7d8ec5ce3eece52c4b16972578e3390c": {
+    commitSha: "a04997be7d8ec5ce3eece52c4b16972578e3390c",
+    tagLabel: "ui-plan-hold",
+    colorTone: "attention",
+    note: "Selective RCUITuner 1b4c822 UI improvements; on hold pending newer UI plan.",
+    updatedAt: 1793961600,
+    confirmed: true,
+    triageStatus: "hold",
+  },
+  "11eef892205e22701b597a70668040add3eb04df": {
+    commitSha: "11eef892205e22701b597a70668040add3eb04df",
+    tagLabel: "absorbed-in-mainline",
+    colorTone: "done",
+    note: "Name Tag aerial climb tracker & inward ring reworked and absorbed into mainline 6bd41edd.",
+    updatedAt: 1793961600,
+    confirmed: true,
+    triageStatus: "absorbed",
+    linkedCommitSha: "6bd41edd3700dec26783f73972326f93f15d490e",
+  },
+  "654b88228d86f0a65e805e498a2dcd21365cee2c": {
+    commitSha: "654b88228d86f0a65e805e498a2dcd21365cee2c",
+    tagLabel: "useful-needs-catchup",
+    colorTone: "success",
+    note: "Useful pure module naming alignment; currently behind latest architecture and needs catch-up merge.",
+    updatedAt: 1793961600,
+    confirmed: true,
+    triageStatus: "useful",
+  },
+};
+
 export const DEFAULT_ORPHAN_HORIZON_COMMIT_LIMIT = 10;
 
 export const DEMO_ROCKET_COMPANION_SNAPSHOT: RepositorySnapshot = {
   "repoPath": "/Users/dev/Workspace/RocketCompanion",
   "repoName": "RocketCompanion",
-  "headSha": "904344545ef1c3fb2c58875b44c9b2e8bd7a662b",
+  "headSha": "90434454ce75bb8e5c88be2dea60ee3f0178b5dc",
   "headRefName": "z/merge-clean-six-post-3dd58c6e",
   "isDetachedHead": false,
   "remoteSyncAvailable": false,

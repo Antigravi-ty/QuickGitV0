@@ -5,9 +5,13 @@ import {
   GitBranchRef,
   GitCommitNode,
   GraphEdgeSegment,
+  LineageDepthMode,
+  LocalCommitAnnotation,
   OrphanTreeComponent,
   PositionedCommitRow,
   RepositorySnapshot,
+  TopologyFilterCategory,
+  UnmergedClusterSummary,
 } from "../types/gitTypes";
 import { stripRemotePrefix } from "./formatters";
 
@@ -18,13 +22,9 @@ export interface LayoutComputeInput {
   showArchivedOrphanTrees: boolean;
   includeLocalStaleBranches?: boolean;
   searchQuery: string;
-  filterCategory:
-    | "all"
-    | "mainline"
-    | "unmerged_tip"
-    | "multi_merged"
-    | "submodule_bump";
+  filterCategory: TopologyFilterCategory;
   focusedSubmodulePath: string | null;
+  commitAnnotations?: Record<string, LocalCommitAnnotation>;
 }
 
 interface ActiveLaneSlot {
@@ -287,6 +287,7 @@ export function computeTopologyLayout(
     showArchivedOrphanTrees,
     includeLocalStaleBranches = false,
     searchQuery,
+    commitAnnotations = {},
   } = input;
 
   const shaToCommit = new Map<string, GitCommitNode>();
@@ -440,6 +441,7 @@ export function computeTopologyLayout(
     }
 
     if (normalizedQuery.length > 0) {
+      const ann = commitAnnotations[commit.sha];
       const haystacks = [
         commit.sha,
         commit.shortSha,
@@ -448,6 +450,10 @@ export function computeTopologyLayout(
         ...commit.refs,
         ...(commit.staleRefs ?? []),
         ...Object.values(commit.submodulePointers),
+        ann?.tagLabel ?? "",
+        ann?.note ?? "",
+        ann?.triageStatus ?? "",
+        ann?.linkedCommitSha ?? "",
       ];
       const matched = haystacks.some((h) =>
         h.toLowerCase().includes(normalizedQuery)
@@ -886,3 +892,194 @@ export function computeTopologyLayout(
     branchSummaries,
   };
 }
+
+export function computeCommitLineageAndCluster(params: {
+  layout: ComputedTopologyLayout | null;
+  selectedCommitSha: string | null;
+  lineageDepthMode: LineageDepthMode;
+  annotations: Record<string, LocalCommitAnnotation>;
+}): {
+  focusedConnectedShas: Set<string>;
+  unmergedCluster: UnmergedClusterSummary | null;
+  reverseLinkedFromMap: Map<string, string[]>;
+} {
+  const { layout, selectedCommitSha, lineageDepthMode, annotations } = params;
+  const focusedConnectedShas = new Set<string>();
+  const reverseLinkedFromMap = new Map<string, string[]>();
+
+  if (!layout) {
+    return {
+      focusedConnectedShas,
+      unmergedCluster: null,
+      reverseLinkedFromMap,
+    };
+  }
+
+  const rowBySha = new Map<string, PositionedCommitRow>();
+  for (const row of layout.rows) {
+    rowBySha.set(row.commit.sha, row);
+  }
+
+  for (const [sourceSha, ann] of Object.entries(annotations)) {
+    const rawLinked = ann.linkedCommitSha?.trim();
+    if (!rawLinked) {
+      continue;
+    }
+    let resolvedTargetSha = rawLinked;
+    if (!rowBySha.has(resolvedTargetSha)) {
+      const prefixMatch = layout.rows.find((r) =>
+        r.commit.sha.startsWith(rawLinked)
+      );
+      if (prefixMatch) {
+        resolvedTargetSha = prefixMatch.commit.sha;
+      }
+    }
+    const existing = reverseLinkedFromMap.get(resolvedTargetSha) ?? [];
+    if (!existing.includes(sourceSha)) {
+      existing.push(sourceSha);
+      reverseLinkedFromMap.set(resolvedTargetSha, existing);
+    }
+  }
+
+  if (!selectedCommitSha || !rowBySha.has(selectedCommitSha)) {
+    return {
+      focusedConnectedShas,
+      unmergedCluster: null,
+      reverseLinkedFromMap,
+    };
+  }
+
+  const selectedRow = rowBySha.get(selectedCommitSha)!;
+  const isUnmerged =
+    selectedRow.divergenceKind === "unmerged_tip" ||
+    selectedRow.divergenceKind === "diverged";
+
+  let unmergedCluster: UnmergedClusterSummary | null = null;
+
+  if (isUnmerged) {
+    const clusterSet = new Set<string>([selectedCommitSha]);
+    const boundarySet = new Set<string>();
+    const queue: string[] = [selectedCommitSha];
+
+    while (queue.length > 0) {
+      const curSha = queue.shift()!;
+      const curRow = rowBySha.get(curSha);
+      if (!curRow) {
+        continue;
+      }
+      for (const parentSha of curRow.commit.parents) {
+        const parentRow = rowBySha.get(parentSha);
+        if (!parentRow) {
+          continue;
+        }
+        const parentUnmerged =
+          parentRow.divergenceKind === "unmerged_tip" ||
+          parentRow.divergenceKind === "diverged";
+        if (parentUnmerged) {
+          if (!clusterSet.has(parentSha)) {
+            clusterSet.add(parentSha);
+            queue.push(parentSha);
+          }
+        } else {
+          boundarySet.add(parentSha);
+        }
+      }
+      for (const childSha of curRow.childShas) {
+        const childRow = rowBySha.get(childSha);
+        if (!childRow) {
+          continue;
+        }
+        const childUnmerged =
+          childRow.divergenceKind === "unmerged_tip" ||
+          childRow.divergenceKind === "diverged";
+        if (childUnmerged && !clusterSet.has(childSha)) {
+          clusterSet.add(childSha);
+          queue.push(childSha);
+        }
+      }
+    }
+
+    const sortedClusterRows = Array.from(clusterSet)
+      .map((sha) => rowBySha.get(sha)!)
+      .filter(Boolean)
+      .sort((a, b) => a.rowIndex - b.rowIndex);
+
+    const tipRows = sortedClusterRows.filter(
+      (r) => r.divergenceKind === "unmerged_tip"
+    );
+    const internalRows = sortedClusterRows.filter(
+      (r) => r.divergenceKind !== "unmerged_tip"
+    );
+    const baseBoundaryRows = Array.from(boundarySet)
+      .map((sha) => rowBySha.get(sha)!)
+      .filter(Boolean)
+      .sort((a, b) => a.rowIndex - b.rowIndex);
+
+    unmergedCluster = {
+      clusterShas: sortedClusterRows.map((r) => r.commit.sha),
+      tipRows,
+      internalRows,
+      baseBoundaryRows,
+    };
+  }
+
+  if (lineageDepthMode === "unmerged_cluster" && unmergedCluster) {
+    for (const sha of unmergedCluster.clusterShas) {
+      focusedConnectedShas.add(sha);
+    }
+    for (const bRow of unmergedCluster.baseBoundaryRows) {
+      focusedConnectedShas.add(bRow.commit.sha);
+    }
+  } else {
+    const maxHops = lineageDepthMode === "2_hops" ? 2 : 1;
+    const queue: { sha: string; depth: number }[] = [
+      { sha: selectedCommitSha, depth: 0 },
+    ];
+    focusedConnectedShas.add(selectedCommitSha);
+    while (queue.length > 0) {
+      const { sha, depth } = queue.shift()!;
+      if (depth >= maxHops) {
+        continue;
+      }
+      const r = rowBySha.get(sha);
+      if (!r) {
+        continue;
+      }
+      for (const p of r.commit.parents) {
+        if (!focusedConnectedShas.has(p)) {
+          focusedConnectedShas.add(p);
+          queue.push({ sha: p, depth: depth + 1 });
+        }
+      }
+      for (const c of r.childShas) {
+        if (!focusedConnectedShas.has(c)) {
+          focusedConnectedShas.add(c);
+          queue.push({ sha: c, depth: depth + 1 });
+        }
+      }
+    }
+  }
+
+  const selAnn = annotations[selectedCommitSha];
+  if (selAnn?.linkedCommitSha) {
+    const targetRow =
+      rowBySha.get(selAnn.linkedCommitSha) ??
+      layout.rows.find((r) =>
+        r.commit.sha.startsWith(selAnn.linkedCommitSha ?? "")
+      );
+    if (targetRow) {
+      focusedConnectedShas.add(targetRow.commit.sha);
+    }
+  }
+  const revSources = reverseLinkedFromMap.get(selectedCommitSha) ?? [];
+  for (const sSha of revSources) {
+    focusedConnectedShas.add(sSha);
+  }
+
+  return {
+    focusedConnectedShas,
+    unmergedCluster,
+    reverseLinkedFromMap,
+  };
+}
+
