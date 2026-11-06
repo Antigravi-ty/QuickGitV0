@@ -10,8 +10,16 @@ pub struct GitBranchRef {
     pub is_remote: bool,
     pub is_tag: bool,
     pub is_head: bool,
+    #[serde(default = "default_true")]
+    pub is_on_remote_origin: bool,
+    #[serde(default)]
+    pub has_local_ref: bool,
     pub timestamp: i64,
     pub subject: String,
+}
+
+fn default_true() -> bool {
+    true
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -35,7 +43,11 @@ pub struct GitCommitNode {
     pub author_email: String,
     pub timestamp: i64,
     pub subject: String,
+    #[serde(default)]
+    pub body: String,
     pub refs: Vec<String>,
+    #[serde(default)]
+    pub stale_refs: Vec<String>,
     pub submodule_pointers: HashMap<String, String>,
     pub changed_submodules: Vec<String>,
 }
@@ -57,6 +69,10 @@ pub struct RepositorySnapshot {
     pub head_sha: String,
     pub head_ref_name: Option<String>,
     pub is_detached_head: bool,
+    #[serde(default)]
+    pub remote_sync_available: bool,
+    #[serde(default)]
+    pub last_remote_sync_timestamp: Option<i64>,
     pub branches: Vec<GitBranchRef>,
     pub submodules: Vec<SubmoduleConfigEntry>,
     pub commits: Vec<GitCommitNode>,
@@ -91,6 +107,12 @@ pub struct RepositoryLocalMetadata {
     pub local_base_ref: Option<String>,
     pub orphan_horizon_commit_limit: usize,
     pub show_archived_orphan_trees: bool,
+    #[serde(default)]
+    pub include_local_stale_branches: bool,
+    #[serde(default)]
+    pub remote_live_refs: HashMap<String, String>,
+    #[serde(default)]
+    pub last_remote_sync_timestamp: Option<i64>,
     pub commit_annotations: HashMap<String, LocalCommitAnnotation>,
 }
 

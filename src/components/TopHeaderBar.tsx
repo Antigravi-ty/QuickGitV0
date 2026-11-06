@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   ArrowLeft,
+  CloudDownload,
   FolderGit2,
+  FolderOpen,
   GitBranch,
   Layers,
   Moon,
@@ -12,48 +14,50 @@ import {
   Sun,
 } from "lucide-react";
 import { useRepositoryStore } from "../stores/repositoryStore";
+import { stripRemotePrefix } from "../utils/formatters";
 
 export const TopHeaderBar: React.FC = () => {
-  const {
-    snapshot,
-    layout,
-    parentRepoPathStack,
-    searchQuery,
-    filterCategory,
-    focusLineageOnly,
-    isLoading,
-    theme,
-    loadRepositoryByPath,
-    popParentRepository,
-    refreshCurrentRepository,
-    setSearchQuery,
-    setFilterCategory,
-    toggleFocusLineageOnly,
-    toggleTheme,
-  } = useRepositoryStore();
-
-  const [pathInput, setPathInput] = useState(
-    snapshot?.repoPath ?? "/Users/dev/Workspace/RocketCompanion"
+  const snapshot = useRepositoryStore((s) => s.snapshot);
+  const resolvedBaseRefName = useRepositoryStore(
+    (s) => s.layout?.resolvedBaseRefName ?? null
   );
-
-  React.useEffect(() => {
-    if (snapshot?.repoPath) {
-      setPathInput(snapshot.repoPath);
-    }
-  }, [snapshot?.repoPath]);
-
-  const handleImportSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pathInput.trim()) {
-      void loadRepositoryByPath(pathInput.trim(), false);
-    }
-  };
+  const parentRepoPathStack = useRepositoryStore((s) => s.parentRepoPathStack);
+  const searchQuery = useRepositoryStore((s) => s.searchQuery);
+  const filterCategory = useRepositoryStore((s) => s.filterCategory);
+  const focusLineageOnly = useRepositoryStore((s) => s.focusLineageOnly);
+  const isLoading = useRepositoryStore((s) => s.isLoading);
+  const isSyncingOrigin = useRepositoryStore((s) => s.isSyncingOrigin);
+  const theme = useRepositoryStore((s) => s.theme);
+  const selectAndLoadRepositoryFolder = useRepositoryStore(
+    (s) => s.selectAndLoadRepositoryFolder
+  );
+  const popParentRepository = useRepositoryStore((s) => s.popParentRepository);
+  const refreshCurrentRepository = useRepositoryStore(
+    (s) => s.refreshCurrentRepository
+  );
+  const syncCurrentRepositoryOrigin = useRepositoryStore(
+    (s) => s.syncCurrentRepositoryOrigin
+  );
+  const setSearchQuery = useRepositoryStore((s) => s.setSearchQuery);
+  const setFilterCategory = useRepositoryStore((s) => s.setFilterCategory);
+  const toggleFocusLineageOnly = useRepositoryStore(
+    (s) => s.toggleFocusLineageOnly
+  );
+  const toggleTheme = useRepositoryStore((s) => s.toggleTheme);
 
   const isClean = snapshot?.workingTreeStatus.isClean ?? true;
 
   return (
     <header className="primer-header">
-      <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 320 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          flex: 1,
+          minWidth: 300,
+        }}
+      >
         <div
           style={{
             display: "inline-flex",
@@ -61,7 +65,7 @@ export const TopHeaderBar: React.FC = () => {
             gap: 6,
             fontWeight: 700,
             fontSize: 13.5,
-            paddingRight: 6,
+            paddingRight: 4,
           }}
         >
           <FolderGit2 size={16} style={{ color: "var(--fg-accent)" }} />
@@ -80,44 +84,88 @@ export const TopHeaderBar: React.FC = () => {
           </button>
         )}
 
-        <form
-          onSubmit={handleImportSubmit}
-          style={{ display: "flex", alignItems: "center", gap: 6, flex: 1, maxWidth: 520 }}
+        <button
+          type="button"
+          className="primer-btn primer-btn-primary"
+          onClick={() => void selectAndLoadRepositoryFolder()}
+          disabled={isLoading}
+          title="Open native folder picker to select and save a Git repository folder"
         >
-          <input
-            type="text"
-            className="primer-input"
-            value={pathInput}
-            onChange={(e) => setPathInput(e.target.value)}
-            placeholder="Local repository path (e.g. /Users/.../RocketCompanion)"
-            style={{ fontFamily: "var(--font-mono-stack)", fontSize: 11.5 }}
-          />
+          <FolderOpen size={13} />
+          <span>Select Folder...</span>
+        </button>
+
+        {snapshot && (
           <button
-            type="submit"
-            className="primer-btn primer-btn-primary"
+            type="button"
+            className="primer-btn"
+            onClick={() => void selectAndLoadRepositoryFolder()}
             disabled={isLoading}
+            title={`Active repository: ${snapshot.repoPath} (Click to switch folder)`}
+            style={{
+              maxWidth: 320,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              fontFamily: "var(--font-mono-stack)",
+              fontSize: 11.5,
+            }}
           >
-            Load Repo
+            <span style={{ fontWeight: 700, color: "var(--fg-accent)" }}>
+              {snapshot.repoName}
+            </span>
+            <span
+              style={{
+                color: "var(--fg-muted)",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {snapshot.repoPath}
+            </span>
           </button>
-        </form>
+        )}
 
         <button
           type="button"
           className="primer-btn"
           onClick={() => void refreshCurrentRepository()}
-          disabled={isLoading}
-          title="Rescan Git topology and working tree status"
+          disabled={isLoading || !snapshot}
+          title="Rescan local Git topology and working tree status"
         >
           <RefreshCw size={13} className={isLoading ? "spin-icon" : ""} />
           <span>Refresh</span>
         </button>
+
+        <button
+          type="button"
+          className="primer-btn primer-btn-status-accent"
+          onClick={() => void syncCurrentRepositoryOrigin()}
+          disabled={isSyncingOrigin || isLoading || !snapshot}
+          title="Fetch latest cloud origin history without pruning local branches, and mark local-only / cloud-deleted branches in gray"
+        >
+          <CloudDownload
+            size={13}
+            className={isSyncingOrigin ? "spin-icon" : ""}
+          />
+          <span>{isSyncingOrigin ? "Syncing Origin..." : "Sync Origin"}</span>
+        </button>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-        {layout?.resolvedBaseRefName && (
-          <span className="primer-badge primer-badge-accent" title="Local visual mainline base">
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          flexWrap: "wrap",
+        }}
+      >
+        {resolvedBaseRefName && (
+          <span
+            className="primer-badge primer-badge-accent"
+            title="Local visual mainline base spine"
+          >
             <GitBranch size={12} />
-            <span>Base: {layout.resolvedBaseRefName}</span>
+            <span>Base: {stripRemotePrefix(resolvedBaseRefName)}</span>
           </span>
         )}
 
@@ -131,7 +179,7 @@ export const TopHeaderBar: React.FC = () => {
           <span>{isClean ? "Worktree Clean" : "Dirty (Checkout Locked)"}</span>
         </span>
 
-        <div style={{ position: "relative", width: 210 }}>
+        <div style={{ position: "relative", width: 205 }}>
           <Search
             size={13}
             style={{
@@ -147,17 +195,21 @@ export const TopHeaderBar: React.FC = () => {
             className="primer-input"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Filter SHA, branch, submodule..."
+            placeholder="Search SHA, title, branch..."
             style={{ paddingLeft: 26, fontSize: 11.5 }}
           />
         </div>
 
-        <div className="primer-segmented-control" style={{ width: "auto" }}>
+        <div
+          className="primer-segmented-control"
+          style={{ width: "auto" }}
+          title="Highlight specific commit categories in-place while keeping all commits visible in the graph"
+        >
           {(
             [
               { id: "all", label: "All" },
               { id: "mainline", label: "Mainline" },
-              { id: "unmerged_tip", label: "Unmerged Tips" },
+              { id: "unmerged_tip", label: "Unmerged" },
               { id: "multi_merged", label: "Merges" },
               { id: "submodule_bump", label: "Submodule Bumps" },
             ] as const
@@ -166,7 +218,9 @@ export const TopHeaderBar: React.FC = () => {
               key={tab.id}
               type="button"
               className={`primer-segmented-button ${
-                filterCategory === tab.id ? "primer-segmented-button-active" : ""
+                filterCategory === tab.id
+                  ? "primer-segmented-button-active"
+                  : ""
               }`}
               onClick={() => setFilterCategory(tab.id)}
             >
@@ -181,7 +235,7 @@ export const TopHeaderBar: React.FC = () => {
             focusLineageOnly ? "primer-btn-sponsors" : ""
           }`}
           onClick={toggleFocusLineageOnly}
-          title="Dim unrelated cross-lane merge lines and highlight only direct parents/children of the selected commit"
+          title="Highlight only direct parents and children of the selected commit while desaturating unrelated branches"
         >
           <Layers size={13} />
           <span>{focusLineageOnly ? "Focus Lineage: ON" : "Focus Lineage"}</span>
@@ -191,7 +245,7 @@ export const TopHeaderBar: React.FC = () => {
           type="button"
           className="primer-btn primer-btn-icon-only"
           onClick={toggleTheme}
-          title="Toggle color mode"
+          title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
         >
           {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
         </button>

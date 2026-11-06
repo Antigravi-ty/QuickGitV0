@@ -20,6 +20,8 @@ export interface GitBranchRef {
   isRemote: boolean;
   isTag: boolean;
   isHead: boolean;
+  isOnRemoteOrigin?: boolean;
+  hasLocalRef?: boolean;
   timestamp: number;
   subject: string;
 }
@@ -41,7 +43,9 @@ export interface GitCommitNode {
   authorEmail: string;
   timestamp: number;
   subject: string;
+  body?: string;
   refs: string[];
+  staleRefs?: string[];
   submodulePointers: Record<string, string>;
   changedSubmodules: string[];
 }
@@ -59,6 +63,8 @@ export interface RepositorySnapshot {
   headSha: string;
   headRefName: string | null;
   isDetachedHead: boolean;
+  remoteSyncAvailable?: boolean;
+  lastRemoteSyncTimestamp?: number | null;
   branches: GitBranchRef[];
   submodules: SubmoduleConfigEntry[];
   commits: GitCommitNode[];
@@ -87,6 +93,9 @@ export interface RepositoryLocalMetadata {
   localBaseRef: string | null;
   orphanHorizonCommitLimit: number;
   showArchivedOrphanTrees: boolean;
+  includeLocalStaleBranches?: boolean;
+  remoteLiveRefs?: Record<string, string>;
+  lastRemoteSyncTimestamp?: number | null;
   commitAnnotations: Record<string, LocalCommitAnnotation>;
 }
 
@@ -109,8 +118,14 @@ export interface OrphanTreeComponent {
 
 export interface BranchClassificationSummary {
   branch: GitBranchRef;
-  category: "base" | "unmerged_tip" | "merged" | "orphan_disconnected";
+  category:
+    | "base"
+    | "unmerged_tip"
+    | "merged"
+    | "orphan_disconnected"
+    | "local_stale";
   aheadCount: number;
+  isOnRemoteOrigin: boolean;
 }
 
 export interface GraphEdgeSegment {
@@ -120,9 +135,11 @@ export interface GraphEdgeSegment {
   toRow: number;
   fromLane: number;
   toLane: number;
+  viaLane: number;
   colorIndex: number;
   isMergeEdge: boolean;
   mergeParentIndex: number;
+  isMergedIntoBase: boolean;
 }
 
 export interface PositionedCommitRow {
@@ -149,5 +166,6 @@ export interface ComputedTopologyLayout {
   orphanComponents: OrphanTreeComponent[];
   hiddenOrphanCommitCount: number;
   hiddenOrphanTreeCount: number;
+  hiddenStaleCommitCount: number;
   branchSummaries: BranchClassificationSummary[];
 }

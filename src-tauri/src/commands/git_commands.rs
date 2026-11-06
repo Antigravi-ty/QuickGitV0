@@ -1,5 +1,5 @@
 use crate::git_engine::repository_scanner::{
-    checkout_detached_with_submodules, scan_repository,
+    checkout_detached_with_submodules, query_remote_origin_heads, scan_repository,
 };
 use crate::models::git_models::{
     AppWorkspaceMetadata, DetachedCheckoutOutcome, LocalCommitAnnotation, RepositorySnapshot,
@@ -8,6 +8,7 @@ use crate::storage::local_metadata_store::{
     ensure_repo_entry, load_workspace_metadata, resolve_app_config_dir, save_workspace_metadata,
     upsert_commit_annotation,
 };
+use std::path::Path;
 use std::process::Command;
 use tauri::AppHandle;
 
@@ -17,14 +18,138 @@ pub fn load_workspace_metadata_cmd(app: AppHandle) -> AppWorkspaceMetadata {
 }
 
 #[tauri::command]
+pub fn pick_repository_directory_cmd() -> Result<Option<String>, String> {
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("osascript")
+            .args([
+                "-e",
+                "POSIX path of (choose folder with prompt \"Select Git Repository Folder\")",
+            ])
+            .output()
+            .map_err(|e| format!("Failed to open macOS folder picker: {}", e))?;
+
+        if !output.status.success() {
+            return Ok(None);
+        }
+        let chosen = String::from_utf8_lossy(&output.stdout)
+            .trim()
+            .trim_end_matches('/')
+            .to_string();
+        if chosen.is_empty() {
+            return Ok(None);
+        }
+        return Ok(Some(chosen));
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        if let Ok(output) = Command::new("zenity")
+            .args([
+                "--file-selection",
+                "--directory",
+                "--title=Select Git Repository Folder",
+            ])
+            .output()
+        {
+            if output.status.success() {
+                let chosen = String::from_utf8_lossy(&output.stdout)
+                    .trim()
+                    .trim_end_matches('/')
+                    .to_string();
+                if !chosen.is_empty() {
+                    return Ok(Some(chosen));
+                }
+            }
+            return Ok(None);
+        }
+        if let Ok(output) = Command::new("kdialog")
+            .args(["--getexistingdirectory", "."])
+            .output()
+        {
+            if output.status.success() {
+                let chosen = String::from_utf8_lossy(&output.stdout)
+                    .trim()
+                    .trim_end_matches('/')
+                    .to_string();
+                if !chosen.is_empty() {
+                    return Ok(Some(chosen));
+                }
+            }
+        }
+        return Ok(None);
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        let script = "Add-Type -AssemblyName System.Windows.Forms; $f = New-Object System.Windows.Forms.FolderBrowserDialog; $f.Description = 'Select Git Repository Folder'; if ($f.ShowDialog() -eq 'OK') { Write-Output $f.SelectedPath }";
+        let output = Command::new("powershell")
+            .args(["-NoProfile", "-Command", script])
+            .output()
+            .map_err(|e| format!("Failed to open Windows folder picker: {}", e))?;
+        if !output.status.success() {
+            return Ok(None);
+        }
+        let chosen = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        if chosen.is_empty() {
+            return Ok(None);
+        }
+        return Ok(Some(chosen));
+    }
+}
+
+#[tauri::command]
 pub fn inspect_repository_cmd(
     app: AppHandle,
     repo_path: String,
 ) -> Result<RepositorySnapshot, String> {
-    let snapshot = scan_repository(&repo_path)?;
     let mut workspace = load_workspace_metadata(&app);
-    ensure_repo_entry(&mut workspace, &snapshot.repo_path);
+    let trimmed = repo_path.trim().to_string();
+    let cached_refs = workspace
+        .repositories
+        .get(&trimmed)
+        .map(|m| m.remote_live_refs.clone())
+        .filter(|m| !m.is_empty());
+    let last_sync_ts = workspace
+        .repositories
+        .get(&trimmed)
+        .and_then(|m| m.last_remote_sync_timestamp);
+
+    let (snapshot, fresh_sync) =
+        scan_repository(&repo_path, cached_refs.as_ref(), last_sync_ts)?;
+
+    let entry = ensure_repo_entry(&mut workspace, &snapshot.repo_path);
+    if let Some((live_map, sync_ts)) = fresh_sync {
+        entry.remote_live_refs = live_map;
+        entry.last_remote_sync_timestamp = Some(sync_ts);
+    }
     let _ = save_workspace_metadata(&app, &workspace);
+    Ok(snapshot)
+}
+
+#[tauri::command]
+pub fn sync_remote_origin_cmd(
+    app: AppHandle,
+    repo_path: String,
+) -> Result<RepositorySnapshot, String> {
+    let path_obj = Path::new(repo_path.trim());
+    if !path_obj.exists() {
+        return Err(format!("Repository path does not exist: {}", repo_path));
+    }
+    let live_map = query_remote_origin_heads(path_obj, true)?;
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs() as i64)
+        .unwrap_or(0);
+
+    let (snapshot, _) = scan_repository(&repo_path, Some(&live_map), Some(now))?;
+
+    let mut workspace = load_workspace_metadata(&app);
+    let entry = ensure_repo_entry(&mut workspace, &snapshot.repo_path);
+    entry.remote_live_refs = live_map;
+    entry.last_remote_sync_timestamp = Some(now);
+    save_workspace_metadata(&app, &workspace)?;
+
     Ok(snapshot)
 }
 
@@ -52,6 +177,19 @@ pub fn set_orphan_horizon_cmd(
     let entry = ensure_repo_entry(&mut workspace, &repo_path);
     entry.orphan_horizon_commit_limit = horizon_commit_limit.clamp(1, 200);
     entry.show_archived_orphan_trees = show_archived_orphan_trees;
+    save_workspace_metadata(&app, &workspace)?;
+    Ok(workspace)
+}
+
+#[tauri::command]
+pub fn set_include_local_stale_branches_cmd(
+    app: AppHandle,
+    repo_path: String,
+    include_local_stale_branches: bool,
+) -> Result<AppWorkspaceMetadata, String> {
+    let mut workspace = load_workspace_metadata(&app);
+    let entry = ensure_repo_entry(&mut workspace, &repo_path);
+    entry.include_local_stale_branches = include_local_stale_branches;
     save_workspace_metadata(&app, &workspace)?;
     Ok(workspace)
 }

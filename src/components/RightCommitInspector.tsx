@@ -14,23 +14,44 @@ import {
 import { ANNOTATION_TONE_OPTIONS } from "../config/demoRepositorySnapshot";
 import { openDirectoryInOs } from "../services/tauriGitClient";
 import { useRepositoryStore } from "../stores/repositoryStore";
-import { AnnotationTone } from "../types/gitTypes";
+import { AnnotationTone, CommitDivergenceKind } from "../types/gitTypes";
 import { formatRelativeOrShortTime } from "../utils/formatters";
 
+function formatDivergenceDescription(
+  kind: CommitDivergenceKind | undefined
+): string {
+  switch (kind) {
+    case "mainline":
+      return "MAINLINE (On Selected Base Spine)";
+    case "unmerged_tip":
+      return "UNMERGED TIP (Branch Head Not Merged into Base)";
+    case "diverged":
+      return "UNMERGED LINEAGE (Commit on Unmerged Branch Below Tip)";
+    case "merged":
+      return "MERGED (Already Merged into Selected Base)";
+    case "orphan_disconnected":
+      return "ORPHAN (Disconnected Root Tree)";
+    default:
+      return "COMMIT";
+  }
+}
+
 export const RightCommitInspector: React.FC = () => {
-  const {
-    workspaceMeta,
-    snapshot,
-    layout,
-    selectedCommitSha,
-    isLoading,
-    lastCheckoutOutcome,
-    selectCommit,
-    updateLocalBaseRef,
-    updateCommitAnnotation,
-    runDetachedCheckout,
-    loadRepositoryByPath,
-  } = useRepositoryStore();
+  const workspaceMeta = useRepositoryStore((s) => s.workspaceMeta);
+  const snapshot = useRepositoryStore((s) => s.snapshot);
+  const layout = useRepositoryStore((s) => s.layout);
+  const selectedCommitSha = useRepositoryStore((s) => s.selectedCommitSha);
+  const isLoading = useRepositoryStore((s) => s.isLoading);
+  const lastCheckoutOutcome = useRepositoryStore((s) => s.lastCheckoutOutcome);
+  const selectCommit = useRepositoryStore((s) => s.selectCommit);
+  const updateLocalBaseRef = useRepositoryStore((s) => s.updateLocalBaseRef);
+  const updateCommitAnnotation = useRepositoryStore(
+    (s) => s.updateCommitAnnotation
+  );
+  const runDetachedCheckout = useRepositoryStore((s) => s.runDetachedCheckout);
+  const loadRepositoryByPath = useRepositoryStore(
+    (s) => s.loadRepositoryByPath
+  );
 
   const selectedRow =
     layout?.rows.find((r) => r.commit.sha === selectedCommitSha) ?? null;
@@ -67,7 +88,9 @@ export const RightCommitInspector: React.FC = () => {
   if (!snapshot || !selectedCommit) {
     return (
       <div style={{ padding: 16, color: "var(--fg-muted)", fontSize: 12 }}>
-        Select a commit node in the topology graph to inspect its merge parents, submodule state, and detached checkout controls.
+        Select a commit node in the topology graph to inspect its full commit
+        description, merge parents, submodule state, and detached checkout
+        controls.
       </div>
     );
   }
@@ -116,25 +139,47 @@ export const RightCommitInspector: React.FC = () => {
     >
       {/* Guarded Detached Checkout Card */}
       <div className="primer-box">
-        <div className="primer-box-header" style={{ padding: "8px 12px", fontSize: 12 }}>
+        <div
+          className="primer-box-header"
+          style={{ padding: "8px 12px", fontSize: 12 }}
+        >
           <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
             <Play size={13} />
             <span>Detached State &amp; Submodule Sync</span>
           </span>
           {isCurrentHead && (
-            <span className="primer-label primer-label-success">ACTIVE HEAD</span>
+            <span className="primer-label primer-label-success">
+              ACTIVE HEAD
+            </span>
           )}
         </div>
         <div
           className="primer-box-body"
-          style={{ padding: 10, display: "flex", flexDirection: "column", gap: 8 }}
+          style={{
+            padding: 10,
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+          }}
         >
-          <div style={{ fontSize: 11.5, color: "var(--fg-muted)", lineHeight: 1.45 }}>
-            Synchronizes the entire repository and all submodules (<code>git checkout --detach</code> + <code>git submodule update --init --recursive --checkout</code>) without creating any local branch.
+          <div
+            style={{
+              fontSize: 11.5,
+              color: "var(--fg-muted)",
+              lineHeight: 1.45,
+            }}
+          >
+            Synchronizes the entire repository and all submodules (
+            <code>git checkout --detach</code> +{" "}
+            <code>git submodule update --init --recursive --checkout</code>)
+            without creating any local branch.
           </div>
 
           {!isWorktreeClean && (
-            <div className="primer-banner primer-banner-warning" style={{ padding: "8px 10px" }}>
+            <div
+              className="primer-banner primer-banner-warning"
+              style={{ padding: "8px 10px" }}
+            >
               <div className="primer-banner-main">
                 <div className="primer-banner-icon">
                   <ShieldAlert size={15} />
@@ -238,12 +283,15 @@ export const RightCommitInspector: React.FC = () => {
         </div>
       </div>
 
-      {/* Commit Details & Merge Lineage */}
+      {/* Commit Details, Description & Merge Lineage */}
       <div className="primer-box">
-        <div className="primer-box-header" style={{ padding: "8px 12px", fontSize: 12 }}>
+        <div
+          className="primer-box-header"
+          style={{ padding: "8px 12px", fontSize: 12 }}
+        >
           <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
             <GitCommit size={13} />
-            <span>Commit Metadata</span>
+            <span>Commit Message &amp; Metadata</span>
           </span>
           <span
             style={{
@@ -257,13 +305,48 @@ export const RightCommitInspector: React.FC = () => {
         </div>
         <div
           className="primer-box-body"
-          style={{ padding: 10, display: "flex", flexDirection: "column", gap: 8 }}
+          style={{
+            padding: 10,
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+          }}
         >
-          <div style={{ fontWeight: 600, fontSize: 12.5, lineHeight: 1.45 }}>
+          <div
+            style={{
+              fontWeight: 600,
+              fontSize: 12.5,
+              lineHeight: 1.45,
+              wordBreak: "break-word",
+            }}
+          >
             {selectedCommit.subject}
           </div>
 
-          <div className="primer-readonly-field" style={{ fontFamily: "var(--font-mono-stack)", fontSize: 11 }}>
+          {selectedCommit.body && selectedCommit.body.trim().length > 0 && (
+            <pre
+              className="primer-readonly-field"
+              style={{
+                margin: 0,
+                padding: "8px 10px",
+                maxHeight: 180,
+                overflowY: "auto",
+                overflowX: "auto",
+                whiteSpace: "pre-wrap",
+                fontFamily: "var(--font-mono-stack)",
+                fontSize: 11,
+                lineHeight: 1.45,
+                color: "var(--fg-muted)",
+              }}
+            >
+              {selectedCommit.body}
+            </pre>
+          )}
+
+          <div
+            className="primer-readonly-field"
+            style={{ fontFamily: "var(--font-mono-stack)", fontSize: 11 }}
+          >
             {selectedCommit.sha}
           </div>
 
@@ -281,16 +364,22 @@ export const RightCommitInspector: React.FC = () => {
             <span style={{ fontFamily: "var(--font-mono-stack)" }}>
               {formatRelativeOrShortTime(selectedCommit.timestamp)} UTC
             </span>
-            <span style={{ color: "var(--fg-muted)" }}>Status:</span>
-            <span style={{ fontWeight: 600 }}>
-              {selectedRow?.divergenceKind.toUpperCase() ?? "COMMIT"}
+            <span style={{ color: "var(--fg-muted)" }}>Role:</span>
+            <span style={{ fontWeight: 600, fontSize: 11 }}>
+              {formatDivergenceDescription(selectedRow?.divergenceKind)}
             </span>
           </div>
 
           {/* Parents (Who is merging with whom) */}
           <div>
-            <div className="primer-action-list-header" style={{ paddingLeft: 0 }}>
-              <GitMerge size={11} style={{ marginRight: 4, verticalAlign: "middle" }} />
+            <div
+              className="primer-action-list-header"
+              style={{ paddingLeft: 0 }}
+            >
+              <GitMerge
+                size={11}
+                style={{ marginRight: 4, verticalAlign: "middle" }}
+              />
               Parent Lineage ({selectedCommit.parents.length})
             </div>
             {selectedCommit.parents.length === 0 ? (
@@ -298,9 +387,18 @@ export const RightCommitInspector: React.FC = () => {
                 Root / Orphan Initial Commit (0 parents)
               </div>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 4 }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
+                  marginTop: 4,
+                }}
+              >
                 {selectedCommit.parents.map((pSha, idx) => {
-                  const parentNode = snapshot.commits.find((c) => c.sha === pSha);
+                  const parentNode = snapshot.commits.find(
+                    (c) => c.sha === pSha
+                  );
                   return (
                     <button
                       key={pSha}
@@ -310,7 +408,13 @@ export const RightCommitInspector: React.FC = () => {
                       onClick={() => selectCommit(pSha)}
                     >
                       <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
+                          }}
+                        >
                           <span
                             className={`primer-label ${
                               idx === 0
@@ -318,7 +422,9 @@ export const RightCommitInspector: React.FC = () => {
                                 : "primer-label-done"
                             }`}
                           >
-                            {idx === 0 ? "Base Parent #1" : `Merged Parent #${idx + 1}`}
+                            {idx === 0
+                              ? "Base Parent #1"
+                              : `Merged Parent #${idx + 1}`}
                           </span>
                           <span
                             style={{
@@ -354,12 +460,25 @@ export const RightCommitInspector: React.FC = () => {
           {/* Children (Branches/Commits that built upon or merged this commit) */}
           {selectedRow && selectedRow.childShas.length > 0 && (
             <div>
-              <div className="primer-action-list-header" style={{ paddingLeft: 0 }}>
-                Direct Children / Merged Into ({selectedRow.childShas.length})
+              <div
+                className="primer-action-list-header"
+                style={{ paddingLeft: 0 }}
+              >
+                Direct Children / Branched &amp; Merged Into (
+                {selectedRow.childShas.length})
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 4 }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
+                  marginTop: 4,
+                }}
+              >
                 {selectedRow.childShas.map((cSha) => {
-                  const childNode = snapshot.commits.find((c) => c.sha === cSha);
+                  const childNode = snapshot.commits.find(
+                    (c) => c.sha === cSha
+                  );
                   const isSecondParentMerge =
                     childNode &&
                     childNode.parents.length > 1 &&
@@ -373,7 +492,13 @@ export const RightCommitInspector: React.FC = () => {
                       onClick={() => selectCommit(cSha)}
                     >
                       <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
+                          }}
+                        >
                           <span
                             className={`primer-label ${
                               isSecondParentMerge
@@ -381,7 +506,9 @@ export const RightCommitInspector: React.FC = () => {
                                 : "primer-label-neutral"
                             }`}
                           >
-                            {isSecondParentMerge ? "Merged Into" : "Child"}
+                            {isSecondParentMerge
+                              ? "Merged Into"
+                              : "Forked Child"}
                           </span>
                           <span
                             style={{
@@ -419,15 +546,25 @@ export const RightCommitInspector: React.FC = () => {
       {/* Submodule Snapshot Pointers at This Commit */}
       {Object.keys(selectedCommit.submodulePointers).length > 0 && (
         <div className="primer-box">
-          <div className="primer-box-header" style={{ padding: "8px 12px", fontSize: 12 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <div
+            className="primer-box-header"
+            style={{ padding: "8px 12px", fontSize: 12 }}
+          >
+            <span
+              style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+            >
               <Box size={13} />
               <span>Submodule Pointers at {selectedCommit.shortSha}</span>
             </span>
           </div>
           <div
             className="primer-box-body"
-            style={{ padding: 10, display: "flex", flexDirection: "column", gap: 6 }}
+            style={{
+              padding: 10,
+              display: "flex",
+              flexDirection: "column",
+              gap: 6,
+            }}
           >
             {Object.entries(selectedCommit.submodulePointers).map(
               ([subPath, subSha]) => {
@@ -509,7 +646,10 @@ export const RightCommitInspector: React.FC = () => {
 
       {/* Local-Only Tag & Note Editor */}
       <div className="primer-box">
-        <div className="primer-box-header" style={{ padding: "8px 12px", fontSize: 12 }}>
+        <div
+          className="primer-box-header"
+          style={{ padding: "8px 12px", fontSize: 12 }}
+        >
           <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
             <Tag size={13} />
             <span>Local Commit Tag &amp; Note (Local-Only)</span>
@@ -521,7 +661,12 @@ export const RightCommitInspector: React.FC = () => {
         <form
           onSubmit={(e) => void handleSaveAnnotation(e)}
           className="primer-box-body"
-          style={{ padding: 10, display: "flex", flexDirection: "column", gap: 8 }}
+          style={{
+            padding: 10,
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+          }}
         >
           <input
             type="text"

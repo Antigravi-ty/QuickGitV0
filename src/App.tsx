@@ -8,15 +8,13 @@ import { useSidebarResize } from "./hooks/useSidebarResize";
 import { useRepositoryStore } from "./stores/repositoryStore";
 
 export const App: React.FC = () => {
-  const {
-    errorMessage,
-    leftSidebarWidth,
-    rightSidebarWidth,
-    initializeWorkspace,
-    clearCheckoutBanner,
-    setLeftSidebarWidth,
-    setRightSidebarWidth,
-  } = useRepositoryStore();
+  const errorMessage = useRepositoryStore((s) => s.errorMessage);
+  const leftSidebarWidth = useRepositoryStore((s) => s.leftSidebarWidth);
+  const rightSidebarWidth = useRepositoryStore((s) => s.rightSidebarWidth);
+  const initializeWorkspace = useRepositoryStore((s) => s.initializeWorkspace);
+  const clearCheckoutBanner = useRepositoryStore((s) => s.clearCheckoutBanner);
+  const setLeftSidebarWidth = useRepositoryStore((s) => s.setLeftSidebarWidth);
+  const setRightSidebarWidth = useRepositoryStore((s) => s.setRightSidebarWidth);
 
   useEffect(() => {
     void initializeWorkspace();
@@ -66,7 +64,7 @@ export const App: React.FC = () => {
       <div className="primer-main">
         <aside
           className="primer-sidebar"
-          style={{ width: leftSidebarWidth }}
+          style={{ width: `var(--left-sidebar-width, ${leftSidebarWidth}px)` }}
         >
           <LeftBranchSidebar />
           <div
@@ -86,7 +84,7 @@ export const App: React.FC = () => {
         <aside
           className="primer-right-sidebar"
           style={{
-            width: rightSidebarWidth,
+            width: `var(--right-sidebar-width, ${rightSidebarWidth}px)`,
             borderLeft: "1px solid var(--border-default)",
             backgroundColor: "var(--bg-canvas-subtle)",
           }}

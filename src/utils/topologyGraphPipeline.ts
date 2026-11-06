@@ -9,15 +9,41 @@ import {
   PositionedCommitRow,
   RepositorySnapshot,
 } from "../types/gitTypes";
+import { stripRemotePrefix } from "./formatters";
 
 export interface LayoutComputeInput {
   snapshot: RepositorySnapshot;
   localBaseRef: string | null;
   orphanHorizonCommitLimit: number;
   showArchivedOrphanTrees: boolean;
+  includeLocalStaleBranches?: boolean;
   searchQuery: string;
-  filterCategory: "all" | "mainline" | "unmerged_tip" | "multi_merged" | "submodule_bump";
+  filterCategory:
+    | "all"
+    | "mainline"
+    | "unmerged_tip"
+    | "multi_merged"
+    | "submodule_bump";
   focusedSubmodulePath: string | null;
+}
+
+interface ActiveLaneSlot {
+  targetSha: string | null;
+  reservedUntilRow: number;
+  colorIndex: number;
+  isContinuationTarget: boolean;
+}
+
+interface PendingEdgeRecord {
+  fromSha: string;
+  toSha: string;
+  fromRow: number;
+  toRow: number;
+  fromLane: number;
+  viaLane: number;
+  colorIndex: number;
+  isMergeEdge: boolean;
+  mergeParentIndex: number;
 }
 
 function buildUndirectedComponents(
@@ -137,8 +163,12 @@ function resolveBaseTarget(
   const commitSet = new Set(snapshot.commits.map((c) => c.sha));
   if (localBaseRef) {
     const trimmed = localBaseRef.trim();
+    const stripped = stripRemotePrefix(trimmed);
     const matchedBranch = snapshot.branches.find(
-      (b) => b.name === trimmed || b.fullRef === trimmed
+      (b) =>
+        b.name === trimmed ||
+        b.fullRef === trimmed ||
+        stripRemotePrefix(b.name) === stripped
     );
     if (matchedBranch && commitSet.has(matchedBranch.commitSha)) {
       return {
@@ -152,8 +182,11 @@ function resolveBaseTarget(
   }
 
   if (snapshot.headRefName) {
+    const strippedHead = stripRemotePrefix(snapshot.headRefName);
     const headBranch = snapshot.branches.find(
-      (b) => b.name === snapshot.headRefName
+      (b) =>
+        b.name === snapshot.headRefName ||
+        stripRemotePrefix(b.name) === strippedHead
     );
     if (headBranch && commitSet.has(headBranch.commitSha)) {
       return {
@@ -170,11 +203,13 @@ function resolveBaseTarget(
     };
   }
 
-  const firstBranch = snapshot.branches[0];
-  if (firstBranch && commitSet.has(firstBranch.commitSha)) {
+  const firstLiveBranch =
+    snapshot.branches.find((b) => b.isOnRemoteOrigin !== false) ??
+    snapshot.branches[0];
+  if (firstLiveBranch && commitSet.has(firstLiveBranch.commitSha)) {
     return {
-      baseRefName: firstBranch.name,
-      baseSha: firstBranch.commitSha,
+      baseRefName: firstLiveBranch.name,
+      baseSha: firstLiveBranch.commitSha,
     };
   }
 
@@ -214,6 +249,34 @@ function computeAncestorSet(
   return result;
 }
 
+function computeMultiRootReachableSet(
+  seedShas: Iterable<string>,
+  shaToCommit: Map<string, GitCommitNode>
+): Set<string> {
+  const result = new Set<string>();
+  const queue: string[] = [];
+  for (const sha of seedShas) {
+    if (sha && shaToCommit.has(sha) && !result.has(sha)) {
+      result.add(sha);
+      queue.push(sha);
+    }
+  }
+  while (queue.length > 0) {
+    const cur = queue.shift()!;
+    const node = shaToCommit.get(cur);
+    if (!node) {
+      continue;
+    }
+    for (const p of node.parents) {
+      if (shaToCommit.has(p) && !result.has(p)) {
+        result.add(p);
+        queue.push(p);
+      }
+    }
+  }
+  return result;
+}
+
 export function computeTopologyLayout(
   input: LayoutComputeInput
 ): ComputedTopologyLayout {
@@ -222,9 +285,8 @@ export function computeTopologyLayout(
     localBaseRef,
     orphanHorizonCommitLimit,
     showArchivedOrphanTrees,
+    includeLocalStaleBranches = false,
     searchQuery,
-    filterCategory,
-    focusedSubmodulePath,
   } = input;
 
   const shaToCommit = new Map<string, GitCommitNode>();
@@ -232,36 +294,46 @@ export function computeTopologyLayout(
     shaToCommit.set(commit.sha, commit);
   }
 
-  const { components, shaToComponentId, visibleComponentIds } =
-    buildUndirectedComponents(snapshot.commits, orphanHorizonCommitLimit);
-
   const { baseRefName, baseSha } = resolveBaseTarget(snapshot, localBaseRef);
+
+  const liveSeedShas: string[] = [];
+  if (baseSha) {
+    liveSeedShas.push(baseSha);
+  }
+  if (snapshot.headSha) {
+    liveSeedShas.push(snapshot.headSha);
+  }
+  for (const branch of snapshot.branches) {
+    if (branch.isOnRemoteOrigin !== false || branch.isHead) {
+      liveSeedShas.push(branch.commitSha);
+    }
+  }
+  const liveOriginReachableSet = computeMultiRootReachableSet(
+    liveSeedShas,
+    shaToCommit
+  );
+
+  let hiddenStaleCommitCount = 0;
+  const candidateCommits = snapshot.commits.filter((commit) => {
+    if (
+      !includeLocalStaleBranches &&
+      snapshot.remoteSyncAvailable &&
+      liveOriginReachableSet.size > 0 &&
+      !liveOriginReachableSet.has(commit.sha)
+    ) {
+      hiddenStaleCommitCount++;
+      return false;
+    }
+    return true;
+  });
+
+  const { components, shaToComponentId, visibleComponentIds } =
+    buildUndirectedComponents(candidateCommits, orphanHorizonCommitLimit);
+
   const baseComponentId = baseSha ? shaToComponentId.get(baseSha) ?? null : null;
 
   const mainlineSpineSet = computeAncestorSet(baseSha, shaToCommit, true);
   const baseReachableSet = computeAncestorSet(baseSha, shaToCommit, false);
-
-  const childrenMap = new Map<string, string[]>();
-  const mergeChildrenCountMap = new Map<string, number>();
-
-  for (const commit of snapshot.commits) {
-    if (!childrenMap.has(commit.sha)) {
-      childrenMap.set(commit.sha, []);
-    }
-    for (let pIdx = 0; pIdx < commit.parents.length; pIdx++) {
-      const parentSha = commit.parents[pIdx];
-      if (!childrenMap.has(parentSha)) {
-        childrenMap.set(parentSha, []);
-      }
-      childrenMap.get(parentSha)!.push(commit.sha);
-      if (commit.parents.length > 1 && pIdx > 0) {
-        mergeChildrenCountMap.set(
-          parentSha,
-          (mergeChildrenCountMap.get(parentSha) ?? 0) + 1
-        );
-      }
-    }
-  }
 
   const shaToRefLabels = new Map<string, string[]>();
   for (const branch of snapshot.branches) {
@@ -272,33 +344,56 @@ export function computeTopologyLayout(
     shaToRefLabels.set(branch.commitSha, list);
   }
 
+  const strippedBaseRefName = baseRefName ? stripRemotePrefix(baseRefName) : null;
+
   const branchSummaries: BranchClassificationSummary[] = snapshot.branches.map(
     (branch: GitBranchRef) => {
+      const isOnRemoteOrigin = branch.isOnRemoteOrigin !== false;
+      const isMatchingBase =
+        branch.name === baseRefName ||
+        (strippedBaseRefName !== null &&
+          stripRemotePrefix(branch.name) === strippedBaseRefName) ||
+        (baseSha !== null &&
+          branch.commitSha === baseSha &&
+          branch.name === baseRefName);
+
+      if (isMatchingBase) {
+        return {
+          branch,
+          category: "base",
+          aheadCount: 0,
+          isOnRemoteOrigin,
+        };
+      }
+
+      if (!isOnRemoteOrigin && snapshot.remoteSyncAvailable) {
+        return {
+          branch,
+          category: "local_stale",
+          aheadCount: 0,
+          isOnRemoteOrigin: false,
+        };
+      }
+
       const compId = shaToComponentId.get(branch.commitSha);
       if (baseComponentId && compId && compId !== baseComponentId) {
         return {
           branch,
           category: "orphan_disconnected",
           aheadCount: 0,
+          isOnRemoteOrigin,
         };
       }
-      if (
-        branch.name === baseRefName ||
-        (baseSha && branch.commitSha === baseSha && branch.name === baseRefName)
-      ) {
-        return {
-          branch,
-          category: "base",
-          aheadCount: 0,
-        };
-      }
+
       if (baseReachableSet.has(branch.commitSha)) {
         return {
           branch,
           category: "merged",
           aheadCount: 0,
+          isOnRemoteOrigin,
         };
       }
+
       let aheadCount = 0;
       const visited = new Set<string>([branch.commitSha]);
       const queue: string[] = [branch.commitSha];
@@ -322,6 +417,7 @@ export function computeTopologyLayout(
         branch,
         category: "unmerged_tip",
         aheadCount,
+        isOnRemoteOrigin,
       };
     }
   );
@@ -337,35 +433,10 @@ export function computeTopologyLayout(
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
-  const visibleCommits = snapshot.commits.filter((commit) => {
+  const visibleCommits = candidateCommits.filter((commit) => {
     const compId = shaToComponentId.get(commit.sha) ?? "";
     if (!showArchivedOrphanTrees && !visibleComponentIds.has(compId)) {
       return false;
-    }
-
-    const children = childrenMap.get(commit.sha) ?? [];
-    const isTip = children.length === 0;
-    const isMainline = mainlineSpineSet.has(commit.sha);
-    const isMerged = baseReachableSet.has(commit.sha);
-    const mergedIntoCount = mergeChildrenCountMap.get(commit.sha) ?? 0;
-
-    if (filterCategory === "mainline" && !isMainline) {
-      return false;
-    }
-    if (filterCategory === "unmerged_tip" && (isMerged || !isTip)) {
-      return false;
-    }
-    if (filterCategory === "multi_merged" && mergedIntoCount < 2 && commit.parents.length < 2) {
-      return false;
-    }
-    if (filterCategory === "submodule_bump") {
-      if (focusedSubmodulePath) {
-        if (!commit.changedSubmodules.includes(focusedSubmodulePath)) {
-          return false;
-        }
-      } else if (commit.changedSubmodules.length === 0) {
-        return false;
-      }
     }
 
     if (normalizedQuery.length > 0) {
@@ -375,6 +446,7 @@ export function computeTopologyLayout(
         commit.subject,
         commit.authorName,
         ...commit.refs,
+        ...(commit.staleRefs ?? []),
         ...Object.values(commit.submodulePointers),
       ];
       const matched = haystacks.some((h) =>
@@ -391,11 +463,76 @@ export function computeTopologyLayout(
   const visibleRowBySha = new Map<string, number>();
   visibleCommits.forEach((c, idx) => visibleRowBySha.set(c.sha, idx));
 
-  const activeLanes: (string | null)[] = [null];
+  const childrenMap = new Map<string, string[]>();
+  const mergeChildrenCountMap = new Map<string, number>();
+
+  for (const commit of visibleCommits) {
+    if (!childrenMap.has(commit.sha)) {
+      childrenMap.set(commit.sha, []);
+    }
+    for (let pIdx = 0; pIdx < commit.parents.length; pIdx++) {
+      const parentSha = commit.parents[pIdx];
+      if (!visibleRowBySha.has(parentSha)) {
+        continue;
+      }
+      if (!childrenMap.has(parentSha)) {
+        childrenMap.set(parentSha, []);
+      }
+      childrenMap.get(parentSha)!.push(commit.sha);
+      if (commit.parents.length > 1 && pIdx > 0) {
+        mergeChildrenCountMap.set(
+          parentSha,
+          (mergeChildrenCountMap.get(parentSha) ?? 0) + 1
+        );
+      }
+    }
+  }
+
+  const activeLanes: ActiveLaneSlot[] = [
+    {
+      targetSha: null,
+      reservedUntilRow: -1,
+      colorIndex: 0,
+      isContinuationTarget: false,
+    },
+  ];
+
+  let nextForkColorSeed = 1;
+  const allocateNextForkColor = (): number => {
+    const color = nextForkColorSeed;
+    nextForkColorSeed = (nextForkColorSeed % 13) + 1;
+    return color;
+  };
+
+  const findOrCreateFreeLane = (currentRow: number): number => {
+    for (let l = 1; l < activeLanes.length; l++) {
+      if (activeLanes[l].reservedUntilRow < currentRow) {
+        return l;
+      }
+    }
+    const newIndex = activeLanes.length;
+    activeLanes.push({
+      targetSha: null,
+      reservedUntilRow: -1,
+      colorIndex: 1,
+      isContinuationTarget: false,
+    });
+    return newIndex;
+  };
+
   let maxLaneCount = 1;
   const rows: PositionedCommitRow[] = [];
+  const pendingEdges: PendingEdgeRecord[] = [];
 
   for (let rowIndex = 0; rowIndex < visibleCommits.length; rowIndex++) {
+    for (let l = 1; l < activeLanes.length; l++) {
+      if (activeLanes[l].reservedUntilRow < rowIndex) {
+        activeLanes[l].targetSha = null;
+        activeLanes[l].reservedUntilRow = -1;
+        activeLanes[l].isContinuationTarget = false;
+      }
+    }
+
     const commit = visibleCommits[rowIndex];
     const isMainline = mainlineSpineSet.has(commit.sha);
     const isReachableFromBase = baseReachableSet.has(commit.sha);
@@ -418,82 +555,266 @@ export function computeTopologyLayout(
       divergenceKind = "unmerged_tip";
     }
 
-    let assignedLane = -1;
+    let assignedLane = 0;
+    let assignedColor = 0;
+
     if (isMainline) {
       assignedLane = 0;
-      activeLanes[0] = null;
-      for (let l = 1; l < activeLanes.length; l++) {
-        if (activeLanes[l] === commit.sha) {
-          activeLanes[l] = null;
-        }
-      }
+      assignedColor = 0;
+      activeLanes[0].targetSha = null;
+      activeLanes[0].reservedUntilRow = -1;
     } else {
+      let continuationLane = -1;
       for (let l = 1; l < activeLanes.length; l++) {
-        if (activeLanes[l] === commit.sha) {
-          if (assignedLane === -1) {
-            assignedLane = l;
+        if (
+          activeLanes[l].isContinuationTarget &&
+          activeLanes[l].targetSha === commit.sha
+        ) {
+          if (continuationLane === -1) {
+            continuationLane = l;
           } else {
-            activeLanes[l] = null;
+            activeLanes[l].targetSha = null;
+            activeLanes[l].reservedUntilRow = -1;
+            activeLanes[l].isContinuationTarget = false;
           }
         }
       }
-      if (assignedLane === -1) {
-        let freeLane = -1;
-        for (let l = 1; l < activeLanes.length; l++) {
-          if (activeLanes[l] === null) {
-            freeLane = l;
-            break;
-          }
-        }
-        if (freeLane === -1) {
-          freeLane = activeLanes.length;
-          activeLanes.push(null);
-        }
-        assignedLane = freeLane;
+
+      if (continuationLane !== -1) {
+        assignedLane = continuationLane;
+        assignedColor = activeLanes[continuationLane].colorIndex;
+        activeLanes[continuationLane].targetSha = null;
+        activeLanes[continuationLane].reservedUntilRow = -1;
+        activeLanes[continuationLane].isContinuationTarget = false;
+      } else {
+        assignedLane = findOrCreateFreeLane(rowIndex);
+        assignedColor = allocateNextForkColor();
+        activeLanes[assignedLane] = {
+          targetSha: null,
+          reservedUntilRow: rowIndex,
+          colorIndex: assignedColor,
+          isContinuationTarget: false,
+        };
       }
     }
 
-    const firstParent = commit.parents[0];
-    if (firstParent && visibleRowBySha.has(firstParent)) {
-      if (mainlineSpineSet.has(firstParent)) {
-        activeLanes[0] = firstParent;
-        if (assignedLane !== 0) {
-          activeLanes[assignedLane] = null;
+    for (let pIdx = 0; pIdx < commit.parents.length; pIdx++) {
+      const parentSha = commit.parents[pIdx];
+      const parentRow = visibleRowBySha.get(parentSha);
+      if (parentRow === undefined || parentRow <= rowIndex) {
+        continue;
+      }
+      const isParentMainline = mainlineSpineSet.has(parentSha);
+
+      if (pIdx === 0) {
+        if (isParentMainline) {
+          if (assignedLane === 0) {
+            activeLanes[0] = {
+              targetSha: parentSha,
+              reservedUntilRow: parentRow,
+              colorIndex: 0,
+              isContinuationTarget: true,
+            };
+            pendingEdges.push({
+              fromSha: commit.sha,
+              toSha: parentSha,
+              fromRow: rowIndex,
+              toRow: parentRow,
+              fromLane: 0,
+              viaLane: 0,
+              colorIndex: 0,
+              isMergeEdge: false,
+              mergeParentIndex: 0,
+            });
+          } else {
+            activeLanes[assignedLane] = {
+              targetSha: parentSha,
+              reservedUntilRow: parentRow,
+              colorIndex: assignedColor,
+              isContinuationTarget: false,
+            };
+            pendingEdges.push({
+              fromSha: commit.sha,
+              toSha: parentSha,
+              fromRow: rowIndex,
+              toRow: parentRow,
+              fromLane: assignedLane,
+              viaLane: assignedLane,
+              colorIndex: assignedColor,
+              isMergeEdge: false,
+              mergeParentIndex: 0,
+            });
+          }
+        } else {
+          let existingContLane = -1;
+          for (let l = 1; l < activeLanes.length; l++) {
+            if (
+              activeLanes[l].isContinuationTarget &&
+              activeLanes[l].targetSha === parentSha
+            ) {
+              existingContLane = l;
+              break;
+            }
+          }
+
+          if (existingContLane === -1 && assignedLane !== 0) {
+            activeLanes[assignedLane] = {
+              targetSha: parentSha,
+              reservedUntilRow: parentRow,
+              colorIndex: assignedColor,
+              isContinuationTarget: true,
+            };
+            pendingEdges.push({
+              fromSha: commit.sha,
+              toSha: parentSha,
+              fromRow: rowIndex,
+              toRow: parentRow,
+              fromLane: assignedLane,
+              viaLane: assignedLane,
+              colorIndex: assignedColor,
+              isMergeEdge: false,
+              mergeParentIndex: 0,
+            });
+          } else if (existingContLane !== -1 && assignedLane !== 0) {
+            activeLanes[assignedLane] = {
+              targetSha: parentSha,
+              reservedUntilRow: parentRow,
+              colorIndex: assignedColor,
+              isContinuationTarget: false,
+            };
+            pendingEdges.push({
+              fromSha: commit.sha,
+              toSha: parentSha,
+              fromRow: rowIndex,
+              toRow: parentRow,
+              fromLane: assignedLane,
+              viaLane: assignedLane,
+              colorIndex: assignedColor,
+              isMergeEdge: false,
+              mergeParentIndex: 0,
+            });
+          } else {
+            const branchLane = findOrCreateFreeLane(rowIndex);
+            const branchColor = allocateNextForkColor();
+            activeLanes[branchLane] = {
+              targetSha: parentSha,
+              reservedUntilRow: parentRow,
+              colorIndex: branchColor,
+              isContinuationTarget: existingContLane === -1,
+            };
+            pendingEdges.push({
+              fromSha: commit.sha,
+              toSha: parentSha,
+              fromRow: rowIndex,
+              toRow: parentRow,
+              fromLane: assignedLane,
+              viaLane: branchLane,
+              colorIndex: branchColor,
+              isMergeEdge: false,
+              mergeParentIndex: 0,
+            });
+          }
         }
       } else {
-        const alreadyTracked = activeLanes.indexOf(firstParent);
-        if (alreadyTracked !== -1 && alreadyTracked !== assignedLane) {
-          activeLanes[assignedLane] = null;
-        } else {
-          activeLanes[assignedLane] = firstParent;
-        }
-      }
-    } else {
-      activeLanes[assignedLane] = null;
-    }
-
-    for (let pIdx = 1; pIdx < commit.parents.length; pIdx++) {
-      const mergeParentSha = commit.parents[pIdx];
-      if (!visibleRowBySha.has(mergeParentSha)) {
-        continue;
-      }
-      if (mainlineSpineSet.has(mergeParentSha)) {
-        activeLanes[0] = mergeParentSha;
-        continue;
-      }
-      if (!activeLanes.includes(mergeParentSha)) {
-        let freeMergeLane = -1;
-        for (let l = 1; l < activeLanes.length; l++) {
-          if (activeLanes[l] === null) {
-            freeMergeLane = l;
-            break;
+        if (isParentMainline) {
+          if (parentRow === rowIndex + 1) {
+            pendingEdges.push({
+              fromSha: commit.sha,
+              toSha: parentSha,
+              fromRow: rowIndex,
+              toRow: parentRow,
+              fromLane: assignedLane,
+              viaLane: assignedLane,
+              colorIndex: assignedColor,
+              isMergeEdge: true,
+              mergeParentIndex: pIdx,
+            });
+          } else {
+            const mergeViaLane = findOrCreateFreeLane(rowIndex);
+            const mergeColor = allocateNextForkColor();
+            activeLanes[mergeViaLane] = {
+              targetSha: parentSha,
+              reservedUntilRow: parentRow,
+              colorIndex: mergeColor,
+              isContinuationTarget: false,
+            };
+            pendingEdges.push({
+              fromSha: commit.sha,
+              toSha: parentSha,
+              fromRow: rowIndex,
+              toRow: parentRow,
+              fromLane: assignedLane,
+              viaLane: mergeViaLane,
+              colorIndex: mergeColor,
+              isMergeEdge: true,
+              mergeParentIndex: pIdx,
+            });
           }
-        }
-        if (freeMergeLane === -1) {
-          freeMergeLane = activeLanes.length;
-          activeLanes.push(mergeParentSha);
         } else {
-          activeLanes[freeMergeLane] = mergeParentSha;
+          let existingContLane = -1;
+          for (let l = 1; l < activeLanes.length; l++) {
+            if (
+              activeLanes[l].isContinuationTarget &&
+              activeLanes[l].targetSha === parentSha
+            ) {
+              existingContLane = l;
+              break;
+            }
+          }
+
+          if (existingContLane === -1) {
+            const mergeLane = findOrCreateFreeLane(rowIndex);
+            const mergeColor = allocateNextForkColor();
+            activeLanes[mergeLane] = {
+              targetSha: parentSha,
+              reservedUntilRow: parentRow,
+              colorIndex: mergeColor,
+              isContinuationTarget: true,
+            };
+            pendingEdges.push({
+              fromSha: commit.sha,
+              toSha: parentSha,
+              fromRow: rowIndex,
+              toRow: parentRow,
+              fromLane: assignedLane,
+              viaLane: mergeLane,
+              colorIndex: mergeColor,
+              isMergeEdge: true,
+              mergeParentIndex: pIdx,
+            });
+          } else if (parentRow === rowIndex + 1) {
+            pendingEdges.push({
+              fromSha: commit.sha,
+              toSha: parentSha,
+              fromRow: rowIndex,
+              toRow: parentRow,
+              fromLane: assignedLane,
+              viaLane: existingContLane,
+              colorIndex: activeLanes[existingContLane].colorIndex,
+              isMergeEdge: true,
+              mergeParentIndex: pIdx,
+            });
+          } else {
+            const mergeViaLane = findOrCreateFreeLane(rowIndex);
+            const mergeColor = activeLanes[existingContLane].colorIndex;
+            activeLanes[mergeViaLane] = {
+              targetSha: parentSha,
+              reservedUntilRow: parentRow,
+              colorIndex: mergeColor,
+              isContinuationTarget: false,
+            };
+            pendingEdges.push({
+              fromSha: commit.sha,
+              toSha: parentSha,
+              fromRow: rowIndex,
+              toRow: parentRow,
+              fromLane: assignedLane,
+              viaLane: mergeViaLane,
+              colorIndex: mergeColor,
+              isMergeEdge: true,
+              mergeParentIndex: pIdx,
+            });
+          }
         }
       }
     }
@@ -508,7 +829,7 @@ export function computeTopologyLayout(
         const pSha = commit.parents[pIdx];
         const refNames = shaToRefLabels.get(pSha);
         if (refNames && refNames.length > 0) {
-          mergeSourceLabels.push(refNames[0].replace(/^origin\//, ""));
+          mergeSourceLabels.push(stripRemotePrefix(refNames[0]));
         } else {
           mergeSourceLabels.push(pSha.slice(0, 7));
         }
@@ -519,7 +840,7 @@ export function computeTopologyLayout(
       commit,
       rowIndex,
       laneIndex: assignedLane,
-      colorIndex: assignedLane,
+      colorIndex: assignedColor,
       divergenceKind,
       isTipCommit,
       isMergeCommit: commit.parents.length > 1,
@@ -531,29 +852,26 @@ export function computeTopologyLayout(
     });
   }
 
-  const edges: GraphEdgeSegment[] = [];
-  for (const row of rows) {
-    const parents = row.commit.parents;
-    for (let pIdx = 0; pIdx < parents.length; pIdx++) {
-      const parentSha = parents[pIdx];
-      const targetRowIdx = visibleRowBySha.get(parentSha);
-      if (targetRowIdx === undefined) {
-        continue;
-      }
-      const targetRow = rows[targetRowIdx];
-      edges.push({
-        fromSha: row.commit.sha,
-        toSha: parentSha,
-        fromRow: row.rowIndex,
-        toRow: targetRow.rowIndex,
-        fromLane: row.laneIndex,
-        toLane: targetRow.laneIndex,
-        colorIndex: pIdx === 0 ? row.colorIndex : targetRow.colorIndex,
-        isMergeEdge: pIdx > 0,
-        mergeParentIndex: pIdx,
-      });
-    }
-  }
+  const edges: GraphEdgeSegment[] = pendingEdges.map((pe) => {
+    const targetRow = rows[pe.toRow];
+    const sourceRow = rows[pe.fromRow];
+    const isMergedIntoBase =
+      sourceRow.divergenceKind === "merged" ||
+      (sourceRow.divergenceKind === "mainline" && pe.isMergeEdge);
+    return {
+      fromSha: pe.fromSha,
+      toSha: pe.toSha,
+      fromRow: pe.fromRow,
+      toRow: pe.toRow,
+      fromLane: pe.fromLane,
+      toLane: targetRow ? targetRow.laneIndex : pe.viaLane,
+      viaLane: pe.viaLane,
+      colorIndex: pe.colorIndex,
+      isMergeEdge: pe.isMergeEdge,
+      mergeParentIndex: pe.mergeParentIndex,
+      isMergedIntoBase,
+    };
+  });
 
   return {
     rows,
@@ -564,6 +882,7 @@ export function computeTopologyLayout(
     orphanComponents: components,
     hiddenOrphanCommitCount,
     hiddenOrphanTreeCount,
+    hiddenStaleCommitCount,
     branchSummaries,
   };
 }

@@ -35,9 +35,10 @@ function loadBrowserFallbackMetadata(): AppWorkspaceMetadata {
     repositories: {
       [demoPath]: {
         repoPath: demoPath,
-        localBaseRef: "z/phase1-lossless-merge",
+        localBaseRef: "z/merge-nametag-freeplay-trail-and-training-cam",
         orphanHorizonCommitLimit: DEFAULT_ORPHAN_HORIZON_COMMIT_LIMIT,
         showArchivedOrphanTrees: false,
+        includeLocalStaleBranches: false,
         commitAnnotations: {
           "0370bf1897bfb0fc842ea288dc3dda0ac7b5338f": {
             commitSha: "0370bf1897bfb0fc842ea288dc3dda0ac7b5338f",
@@ -70,9 +71,8 @@ function ensureFallbackRepoEntry(
   repoPath: string
 ): RepositoryLocalMetadata {
   const clean = repoPath.trim();
-  if (!meta.recentRepositories.includes(clean)) {
-    meta.recentRepositories.unshift(clean);
-  }
+  meta.recentRepositories = meta.recentRepositories.filter((r) => r !== clean);
+  meta.recentRepositories.unshift(clean);
   meta.activeRepositoryPath = clean;
   if (!meta.repositories[clean]) {
     meta.repositories[clean] = {
@@ -80,6 +80,7 @@ function ensureFallbackRepoEntry(
       localBaseRef: null,
       orphanHorizonCommitLimit: DEFAULT_ORPHAN_HORIZON_COMMIT_LIMIT,
       showArchivedOrphanTrees: false,
+      includeLocalStaleBranches: false,
       commitAnnotations: {},
     };
   }
@@ -91,6 +92,13 @@ export async function loadWorkspaceMetadata(): Promise<AppWorkspaceMetadata> {
     return invoke<AppWorkspaceMetadata>("load_workspace_metadata_cmd");
   }
   return loadBrowserFallbackMetadata();
+}
+
+export async function pickRepositoryDirectory(): Promise<string | null> {
+  if (isTauriDesktopRuntime()) {
+    return invoke<string | null>("pick_repository_directory_cmd");
+  }
+  return DEMO_ROCKET_COMPANION_SNAPSHOT.repoPath;
 }
 
 export async function inspectRepository(
@@ -107,6 +115,22 @@ export async function inspectRepository(
   return {
     ...DEMO_ROCKET_COMPANION_SNAPSHOT,
     repoPath: repoPath.trim() || DEMO_ROCKET_COMPANION_SNAPSHOT.repoPath,
+  };
+}
+
+export async function syncRemoteOrigin(
+  repoPath: string
+): Promise<RepositorySnapshot> {
+  if (isTauriDesktopRuntime()) {
+    return invoke<RepositorySnapshot>("sync_remote_origin_cmd", {
+      repoPath,
+    });
+  }
+  return {
+    ...DEMO_ROCKET_COMPANION_SNAPSHOT,
+    repoPath: repoPath.trim() || DEMO_ROCKET_COMPANION_SNAPSHOT.repoPath,
+    remoteSyncAvailable: true,
+    lastRemoteSyncTimestamp: Math.floor(Date.now() / 1000),
   };
 }
 
@@ -143,6 +167,26 @@ export async function setOrphanHorizon(
   const entry = ensureFallbackRepoEntry(meta, repoPath);
   entry.orphanHorizonCommitLimit = horizonCommitLimit;
   entry.showArchivedOrphanTrees = showArchivedOrphanTrees;
+  saveBrowserFallbackMetadata(meta);
+  return meta;
+}
+
+export async function setIncludeLocalStaleBranches(
+  repoPath: string,
+  includeLocalStaleBranches: boolean
+): Promise<AppWorkspaceMetadata> {
+  if (isTauriDesktopRuntime()) {
+    return invoke<AppWorkspaceMetadata>(
+      "set_include_local_stale_branches_cmd",
+      {
+        repoPath,
+        includeLocalStaleBranches,
+      }
+    );
+  }
+  const meta = loadBrowserFallbackMetadata();
+  const entry = ensureFallbackRepoEntry(meta, repoPath);
+  entry.includeLocalStaleBranches = includeLocalStaleBranches;
   saveBrowserFallbackMetadata(meta);
   return meta;
 }

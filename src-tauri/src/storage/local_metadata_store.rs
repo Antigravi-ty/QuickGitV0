@@ -1,6 +1,7 @@
 use crate::models::git_models::{
     AppWorkspaceMetadata, LocalCommitAnnotation, RepositoryLocalMetadata,
 };
+use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -68,11 +69,10 @@ pub fn ensure_repo_entry<'a>(
     repo_path: &str,
 ) -> &'a mut RepositoryLocalMetadata {
     let normalized = repo_path.trim().to_string();
-    if !workspace.recent_repositories.contains(&normalized) {
-        workspace.recent_repositories.insert(0, normalized.clone());
-        if workspace.recent_repositories.len() > 20 {
-            workspace.recent_repositories.truncate(20);
-        }
+    workspace.recent_repositories.retain(|r| r != &normalized);
+    workspace.recent_repositories.insert(0, normalized.clone());
+    if workspace.recent_repositories.len() > 20 {
+        workspace.recent_repositories.truncate(20);
     }
     workspace.active_repository_path = Some(normalized.clone());
     workspace
@@ -83,7 +83,10 @@ pub fn ensure_repo_entry<'a>(
             local_base_ref: None,
             orphan_horizon_commit_limit: 10,
             show_archived_orphan_trees: false,
-            commit_annotations: std::collections::HashMap::new(),
+            include_local_stale_branches: false,
+            remote_live_refs: HashMap::new(),
+            last_remote_sync_timestamp: None,
+            commit_annotations: HashMap::new(),
         })
 }
 

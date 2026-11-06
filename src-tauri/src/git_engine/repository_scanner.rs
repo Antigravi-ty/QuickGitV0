@@ -26,6 +26,84 @@ fn run_git_command(repo_path: &Path, args: &[&str]) -> Result<String, String> {
     Ok(String::from_utf8_lossy(&output.stdout).to_string())
 }
 
+fn strip_branch_prefix(ref_label: &str) -> String {
+    let trimmed = ref_label.trim().trim_start_matches("HEAD -> ").trim();
+    if let Some(rest) = trimmed.strip_prefix("refs/heads/") {
+        return rest.to_string();
+    }
+    if let Some(rest) = trimmed.strip_prefix("refs/remotes/origin/") {
+        return rest.to_string();
+    }
+    if let Some(rest) = trimmed.strip_prefix("refs/tags/") {
+        return rest.to_string();
+    }
+    if let Some(rest) = trimmed.strip_prefix("origin/") {
+        return rest.to_string();
+    }
+    trimmed.to_string()
+}
+
+pub fn query_remote_origin_heads(
+    repo_path: &Path,
+    fetch_objects: bool,
+) -> Result<HashMap<String, String>, String> {
+    if fetch_objects {
+        let _ = run_git_command(
+            repo_path,
+            &[
+                "-c",
+                "http.lowSpeedLimit=1000",
+                "-c",
+                "http.lowSpeedTime=8",
+                "fetch",
+                "origin",
+                "--no-prune",
+            ],
+        );
+    }
+
+    let raw = run_git_command(
+        repo_path,
+        &[
+            "-c",
+            "http.lowSpeedLimit=1000",
+            "-c",
+            "http.lowSpeedTime=6",
+            "ls-remote",
+            "--heads",
+            "--tags",
+            "origin",
+        ],
+    )?;
+
+    let mut live_refs = HashMap::new();
+    for line in raw.lines() {
+        let mut parts = line.split_whitespace();
+        let sha = match parts.next() {
+            Some(s) if !s.is_empty() => s.trim(),
+            _ => continue,
+        };
+        let full_ref = match parts.next() {
+            Some(r) if !r.is_empty() => r.trim(),
+            _ => continue,
+        };
+        let clean_ref = full_ref.strip_suffix("^{}").unwrap_or(full_ref);
+        if let Some(short) = clean_ref
+            .strip_prefix("refs/heads/")
+            .or_else(|| clean_ref.strip_prefix("refs/tags/"))
+        {
+            if !short.is_empty() && short != "HEAD" {
+                live_refs.insert(short.to_string(), sha.to_string());
+            }
+        }
+    }
+
+    if live_refs.is_empty() {
+        return Err("No remote heads returned from origin".to_string());
+    }
+    Ok(live_refs)
+}
+
 pub fn inspect_working_tree_guard(
     repo_path: &Path,
     submodules: &[SubmoduleConfigEntry],
@@ -155,7 +233,11 @@ fn parse_submodules(repo_path: &Path) -> Vec<SubmoduleConfigEntry> {
     result
 }
 
-pub fn scan_repository(raw_repo_path: &str) -> Result<RepositorySnapshot, String> {
+pub fn scan_repository(
+    raw_repo_path: &str,
+    cached_remote_refs: Option<&HashMap<String, String>>,
+    last_sync_timestamp: Option<i64>,
+) -> Result<(RepositorySnapshot, Option<(HashMap<String, String>, i64)>), String> {
     let repo_path = Path::new(raw_repo_path.trim());
     if !repo_path.exists() {
         return Err(format!("Repository path does not exist: {}", raw_repo_path));
@@ -180,6 +262,28 @@ pub fn scan_repository(raw_repo_path: &str) -> Result<RepositorySnapshot, String
         .filter(|s| !s.is_empty());
     let is_detached_head = symbolic_head.is_none();
 
+    let mut fresh_remote_sync: Option<(HashMap<String, String>, i64)> = None;
+    let active_remote_map: Option<HashMap<String, String>> = match cached_remote_refs {
+        Some(existing) if !existing.is_empty() => Some(existing.clone()),
+        _ => match query_remote_origin_heads(canonical_path, false) {
+            Ok(fetched) => {
+                let now = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map(|d| d.as_secs() as i64)
+                    .unwrap_or(0);
+                fresh_remote_sync = Some((fetched.clone(), now));
+                Some(fetched)
+            }
+            Err(_) => None,
+        },
+    };
+
+    let remote_sync_available = active_remote_map.is_some();
+    let effective_sync_ts = fresh_remote_sync
+        .as_ref()
+        .map(|(_, ts)| *ts)
+        .or(last_sync_timestamp);
+
     let refs_raw = run_git_command(
         canonical_path,
         &[
@@ -192,7 +296,9 @@ pub fn scan_repository(raw_repo_path: &str) -> Result<RepositorySnapshot, String
         ],
     )?;
 
-    let mut branches = Vec::new();
+    let mut branch_by_canonical: HashMap<String, GitBranchRef> = HashMap::new();
+    let mut canonical_order: Vec<String> = Vec::new();
+
     for line in refs_raw.lines() {
         let fields: Vec<&str> = line.split('\x1f').collect();
         if fields.len() < 5 {
@@ -208,21 +314,62 @@ pub fn scan_repository(raw_repo_path: &str) -> Result<RepositorySnapshot, String
         let subject = fields[4].trim().to_string();
         let is_remote = full_ref.starts_with("refs/remotes/");
         let is_tag = full_ref.starts_with("refs/tags/");
+        let is_local = full_ref.starts_with("refs/heads/");
+        let canonical_name = strip_branch_prefix(short_name);
+
         let is_head = symbolic_head
             .as_ref()
-            .map(|h| h == short_name)
+            .map(|h| h == short_name || h == &canonical_name)
             .unwrap_or(false);
 
-        branches.push(GitBranchRef {
-            name: short_name.to_string(),
-            full_ref: full_ref.to_string(),
-            commit_sha,
-            is_remote,
-            is_tag,
-            is_head,
-            timestamp,
-            subject,
-        });
+        let is_on_remote_origin = match &active_remote_map {
+            Some(live_map) => live_map.contains_key(&canonical_name),
+            None => is_remote,
+        };
+
+        if let Some(existing) = branch_by_canonical.get_mut(&canonical_name) {
+            if is_local {
+                existing.has_local_ref = true;
+            }
+            if is_remote {
+                existing.is_remote = true;
+                existing.name = short_name.to_string();
+                existing.full_ref = full_ref.to_string();
+                existing.commit_sha = commit_sha;
+                existing.timestamp = timestamp;
+                existing.subject = subject;
+            }
+            if is_head {
+                existing.is_head = true;
+            }
+            if is_on_remote_origin {
+                existing.is_on_remote_origin = true;
+            }
+        } else {
+            canonical_order.push(canonical_name.clone());
+            branch_by_canonical.insert(
+                canonical_name,
+                GitBranchRef {
+                    name: short_name.to_string(),
+                    full_ref: full_ref.to_string(),
+                    commit_sha,
+                    is_remote,
+                    is_tag,
+                    is_head,
+                    is_on_remote_origin,
+                    has_local_ref: is_local,
+                    timestamp,
+                    subject,
+                },
+            );
+        }
+    }
+
+    let mut branches = Vec::new();
+    for key in canonical_order {
+        if let Some(branch) = branch_by_canonical.remove(&key) {
+            branches.push(branch);
+        }
     }
 
     let submodules = parse_submodules(canonical_path);
@@ -235,15 +382,19 @@ pub fn scan_repository(raw_repo_path: &str) -> Result<RepositorySnapshot, String
             "--all",
             "--date-order",
             "--max-count=1200",
-            "--format=%H\x1f%h\x1f%P\x1f%an\x1f%ae\x1f%ct\x1f%D\x1f%s",
+            "--format=%H\x1f%h\x1f%P\x1f%an\x1f%ae\x1f%ct\x1f%D\x1f%s\x1f%b\x1e",
         ],
     )?;
 
     let mut commits = Vec::new();
     let mut sha_to_index: HashMap<String, usize> = HashMap::new();
 
-    for line in log_raw.lines() {
-        let fields: Vec<&str> = line.split('\x1f').collect();
+    for record in log_raw.split('\x1e') {
+        let trimmed_record = record.trim();
+        if trimmed_record.is_empty() {
+            continue;
+        }
+        let fields: Vec<&str> = trimmed_record.split('\x1f').collect();
         if fields.len() < 8 {
             continue;
         }
@@ -257,12 +408,43 @@ pub fn scan_repository(raw_repo_path: &str) -> Result<RepositorySnapshot, String
         let author_name = fields[3].trim().to_string();
         let author_email = fields[4].trim().to_string();
         let timestamp = fields[5].trim().parse::<i64>().unwrap_or(0);
-        let refs: Vec<String> = fields[6]
+
+        let raw_decorations: Vec<String> = fields[6]
             .split(',')
             .map(|r| r.trim().to_string())
-            .filter(|r| !r.is_empty() && r != "origin")
+            .filter(|r| !r.is_empty() && r != "origin" && !r.ends_with("/HEAD"))
             .collect();
+
+        let mut live_refs = Vec::new();
+        let mut stale_refs = Vec::new();
+        let mut seen_canonical = Vec::new();
+
+        for dec in raw_decorations {
+            let is_head_dec = dec == "HEAD" || dec.starts_with("HEAD -> ");
+            let canonical = strip_branch_prefix(&dec);
+            if seen_canonical.contains(&canonical) && !is_head_dec {
+                continue;
+            }
+            seen_canonical.push(canonical.clone());
+
+            let is_live = is_head_dec
+                || match &active_remote_map {
+                    Some(live_map) => live_map.contains_key(&canonical),
+                    None => true,
+                };
+            if is_live {
+                live_refs.push(dec);
+            } else {
+                stale_refs.push(dec);
+            }
+        }
+
         let subject = fields[7].trim().to_string();
+        let body = if fields.len() >= 9 {
+            fields[8].trim().to_string()
+        } else {
+            String::new()
+        };
 
         let idx = commits.len();
         sha_to_index.insert(sha.clone(), idx);
@@ -274,7 +456,9 @@ pub fn scan_repository(raw_repo_path: &str) -> Result<RepositorySnapshot, String
             author_email,
             timestamp,
             subject,
-            refs,
+            body,
+            refs: live_refs,
+            stale_refs,
             submodule_pointers: HashMap::new(),
             changed_submodules: Vec::new(),
         });
@@ -352,17 +536,22 @@ pub fn scan_repository(raw_repo_path: &str) -> Result<RepositorySnapshot, String
 
     let working_tree_status = inspect_working_tree_guard(canonical_path, &submodules);
 
-    Ok(RepositorySnapshot {
-        repo_path: canonical_path.to_string_lossy().to_string(),
-        repo_name,
-        head_sha,
-        head_ref_name: symbolic_head,
-        is_detached_head,
-        branches,
-        submodules,
-        commits,
-        working_tree_status,
-    })
+    Ok((
+        RepositorySnapshot {
+            repo_path: canonical_path.to_string_lossy().to_string(),
+            repo_name,
+            head_sha,
+            head_ref_name: symbolic_head,
+            is_detached_head,
+            remote_sync_available,
+            last_remote_sync_timestamp: effective_sync_ts,
+            branches,
+            submodules,
+            commits,
+            working_tree_status,
+        },
+        fresh_remote_sync,
+    ))
 }
 
 pub fn checkout_detached_with_submodules(
@@ -416,7 +605,10 @@ pub fn checkout_detached_with_submodules(
         blocked_by_dirty_state: false,
         target_sha: target_sha.to_string(),
         message: if synced_submodules.is_empty() {
-            format!("Checked out detached commit {} cleanly.", &target_sha[..target_sha.len().min(8)])
+            format!(
+                "Checked out detached commit {} cleanly.",
+                &target_sha[..target_sha.len().min(8)]
+            )
         } else {
             format!(
                 "Checked out detached commit {} and synchronized {} submodule(s): {}.",

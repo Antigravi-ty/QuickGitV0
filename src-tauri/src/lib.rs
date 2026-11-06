@@ -13,8 +13,10 @@ pub mod storage {
 
 use commands::git_commands::{
     checkout_detached_commit_cmd, inspect_repository_cmd, load_workspace_metadata_cmd,
-    open_app_config_dir_cmd, open_directory_in_os_cmd, remove_recent_repository_cmd,
-    save_commit_annotation_cmd, set_local_base_branch_cmd, set_orphan_horizon_cmd,
+    open_app_config_dir_cmd, open_directory_in_os_cmd, pick_repository_directory_cmd,
+    remove_recent_repository_cmd, save_commit_annotation_cmd,
+    set_include_local_stale_branches_cmd, set_local_base_branch_cmd, set_orphan_horizon_cmd,
+    sync_remote_origin_cmd,
 };
 
 pub fn run() {
@@ -22,9 +24,12 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             load_workspace_metadata_cmd,
+            pick_repository_directory_cmd,
             inspect_repository_cmd,
+            sync_remote_origin_cmd,
             set_local_base_branch_cmd,
             set_orphan_horizon_cmd,
+            set_include_local_stale_branches_cmd,
             save_commit_annotation_cmd,
             remove_recent_repository_cmd,
             checkout_detached_commit_cmd,

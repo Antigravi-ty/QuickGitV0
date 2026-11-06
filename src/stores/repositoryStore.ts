@@ -4,10 +4,13 @@ import {
   checkoutDetachedCommit,
   inspectRepository,
   loadWorkspaceMetadata,
+  pickRepositoryDirectory,
   removeRecentRepository,
   saveCommitAnnotation,
+  setIncludeLocalStaleBranches,
   setLocalBaseBranch,
   setOrphanHorizon,
+  syncRemoteOrigin,
 } from "../services/tauriGitClient";
 import {
   AnnotationTone,
@@ -27,6 +30,22 @@ export type TopologyFilterCategory =
 
 export type ColorThemeMode = "dark" | "light";
 
+const THEME_STORAGE_KEY = "quickgit_v0_theme_mode";
+
+function resolveInitialTheme(): ColorThemeMode {
+  if (typeof window !== "undefined") {
+    try {
+      const saved = localStorage.getItem(THEME_STORAGE_KEY);
+      if (saved === "light" || saved === "dark") {
+        document.documentElement.setAttribute("data-color-mode", saved);
+        return saved;
+      }
+    } catch (_) {}
+    document.documentElement.setAttribute("data-color-mode", "light");
+  }
+  return "light";
+}
+
 interface RepositoryStoreState {
   workspaceMeta: AppWorkspaceMetadata;
   snapshot: RepositorySnapshot | null;
@@ -39,6 +58,7 @@ interface RepositoryStoreState {
   focusedSubmodulePath: string | null;
   focusLineageOnly: boolean;
   isLoading: boolean;
+  isSyncingOrigin: boolean;
   errorMessage: string | null;
   lastCheckoutOutcome: DetachedCheckoutOutcome | null;
   theme: ColorThemeMode;
@@ -46,12 +66,14 @@ interface RepositoryStoreState {
   rightSidebarWidth: number;
 
   initializeWorkspace: () => Promise<void>;
+  selectAndLoadRepositoryFolder: () => Promise<void>;
   loadRepositoryByPath: (
     repoPath: string,
     pushParentStack?: boolean
   ) => Promise<void>;
   popParentRepository: () => Promise<void>;
   refreshCurrentRepository: () => Promise<void>;
+  syncCurrentRepositoryOrigin: () => Promise<void>;
   selectCommit: (sha: string | null) => void;
   setHoveredCommit: (sha: string | null) => void;
   updateLocalBaseRef: (baseRef: string | null) => Promise<void>;
@@ -59,6 +81,7 @@ interface RepositoryStoreState {
     horizonLimit: number,
     showArchived: boolean
   ) => Promise<void>;
+  updateIncludeLocalStaleBranches: (includeLocalStale: boolean) => Promise<void>;
   updateCommitAnnotation: (params: {
     commitSha: string;
     tagLabel: string;
@@ -92,12 +115,15 @@ function recomputeCurrentLayout(
   const orphanHorizonCommitLimit =
     repoMeta?.orphanHorizonCommitLimit ?? DEFAULT_ORPHAN_HORIZON_COMMIT_LIMIT;
   const showArchivedOrphanTrees = repoMeta?.showArchivedOrphanTrees ?? false;
+  const includeLocalStaleBranches =
+    repoMeta?.includeLocalStaleBranches ?? false;
 
   return computeTopologyLayout({
     snapshot,
     localBaseRef,
     orphanHorizonCommitLimit,
     showArchivedOrphanTrees,
+    includeLocalStaleBranches,
     searchQuery,
     filterCategory,
     focusedSubmodulePath,
@@ -120,13 +146,18 @@ export const useRepositoryStore = create<RepositoryStoreState>((set, get) => ({
   focusedSubmodulePath: null,
   focusLineageOnly: false,
   isLoading: false,
+  isSyncingOrigin: false,
   errorMessage: null,
   lastCheckoutOutcome: null,
-  theme: "dark",
+  theme: resolveInitialTheme(),
   leftSidebarWidth: 295,
   rightSidebarWidth: 375,
 
   initializeWorkspace: async () => {
+    const currentTheme = get().theme;
+    if (typeof document !== "undefined") {
+      document.documentElement.setAttribute("data-color-mode", currentTheme);
+    }
     set({ isLoading: true, errorMessage: null });
     try {
       const meta = await loadWorkspaceMetadata();
@@ -141,6 +172,19 @@ export const useRepositoryStore = create<RepositoryStoreState>((set, get) => ({
     } catch (err) {
       set({
         isLoading: false,
+        errorMessage: err instanceof Error ? err.message : String(err),
+      });
+    }
+  },
+
+  selectAndLoadRepositoryFolder: async () => {
+    try {
+      const selectedPath = await pickRepositoryDirectory();
+      if (selectedPath && selectedPath.trim()) {
+        await get().loadRepositoryByPath(selectedPath.trim(), false);
+      }
+    } catch (err) {
+      set({
         errorMessage: err instanceof Error ? err.message : String(err),
       });
     }
@@ -171,7 +215,9 @@ export const useRepositoryStore = create<RepositoryStoreState>((set, get) => ({
         null
       );
       const nextStack =
-        pushParentStack && prevSnapshot && prevSnapshot.repoPath !== snapshot.repoPath
+        pushParentStack &&
+        prevSnapshot &&
+        prevSnapshot.repoPath !== snapshot.repoPath
           ? [...prevStack, prevSnapshot.repoPath]
           : prevStack;
 
@@ -217,12 +263,45 @@ export const useRepositoryStore = create<RepositoryStoreState>((set, get) => ({
     await get().loadRepositoryByPath(current.repoPath, false);
   },
 
+  syncCurrentRepositoryOrigin: async () => {
+    const current = get().snapshot;
+    if (!current) {
+      return;
+    }
+    set({ isSyncingOrigin: true, errorMessage: null });
+    try {
+      const snapshot = await syncRemoteOrigin(current.repoPath);
+      const workspaceMeta = await loadWorkspaceMetadata();
+      const { searchQuery, filterCategory, focusedSubmodulePath } = get();
+      const layout = recomputeCurrentLayout(
+        snapshot,
+        workspaceMeta,
+        searchQuery,
+        filterCategory,
+        focusedSubmodulePath
+      );
+      set({
+        snapshot,
+        workspaceMeta,
+        layout,
+        isSyncingOrigin: false,
+      });
+    } catch (err) {
+      set({
+        isSyncingOrigin: false,
+        errorMessage: err instanceof Error ? err.message : String(err),
+      });
+    }
+  },
+
   selectCommit: (sha: string | null) => {
     set({ selectedCommitSha: sha });
   },
 
   setHoveredCommit: (sha: string | null) => {
-    set({ hoveredCommitSha: sha });
+    if (get().hoveredCommitSha !== sha) {
+      set({ hoveredCommitSha: sha });
+    }
   },
 
   updateLocalBaseRef: async (baseRef: string | null) => {
@@ -251,6 +330,26 @@ export const useRepositoryStore = create<RepositoryStoreState>((set, get) => ({
       snapshot.repoPath,
       horizonLimit,
       showArchived
+    );
+    const { searchQuery, filterCategory, focusedSubmodulePath } = get();
+    const layout = recomputeCurrentLayout(
+      snapshot,
+      workspaceMeta,
+      searchQuery,
+      filterCategory,
+      focusedSubmodulePath
+    );
+    set({ workspaceMeta, layout });
+  },
+
+  updateIncludeLocalStaleBranches: async (includeLocalStale: boolean) => {
+    const snapshot = get().snapshot;
+    if (!snapshot) {
+      return;
+    }
+    const workspaceMeta = await setIncludeLocalStaleBranches(
+      snapshot.repoPath,
+      includeLocalStale
     );
     const { searchQuery, filterCategory, focusedSubmodulePath } = get();
     const layout = recomputeCurrentLayout(
@@ -349,36 +448,18 @@ export const useRepositoryStore = create<RepositoryStoreState>((set, get) => ({
   },
 
   setFilterCategory: (filterCategory: TopologyFilterCategory) => {
-    const { snapshot, workspaceMeta, searchQuery, focusedSubmodulePath } =
-      get();
-    const layout = recomputeCurrentLayout(
-      snapshot,
-      workspaceMeta,
-      searchQuery,
-      filterCategory,
-      focusedSubmodulePath
-    );
-    set({ filterCategory, layout });
+    set({ filterCategory });
   },
 
   setFocusedSubmodulePath: (focusedSubmodulePath: string | null) => {
-    const { snapshot, workspaceMeta, searchQuery } = get();
     const nextFilter: TopologyFilterCategory = focusedSubmodulePath
       ? "submodule_bump"
       : get().filterCategory === "submodule_bump"
       ? "all"
       : get().filterCategory;
-    const layout = recomputeCurrentLayout(
-      snapshot,
-      workspaceMeta,
-      searchQuery,
-      nextFilter,
-      focusedSubmodulePath
-    );
     set({
       focusedSubmodulePath,
       filterCategory: nextFilter,
-      layout,
     });
   },
 
@@ -392,6 +473,9 @@ export const useRepositoryStore = create<RepositoryStoreState>((set, get) => ({
     if (typeof document !== "undefined") {
       document.documentElement.setAttribute("data-color-mode", nextTheme);
     }
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+    } catch (_) {}
     set({ theme: nextTheme });
   },
 
