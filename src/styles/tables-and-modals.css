@@ -1,0 +1,260 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: var(--backdrop-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.primer-datatable-container {
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background-color: var(--bg-canvas-default);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.primer-datatable-scroll {
+  overflow-x: auto;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.primer-datatable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+}
+
+.primer-datatable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background-color: var(--bg-canvas-subtle);
+  color: var(--fg-muted);
+  font-weight: 600;
+  font-size: 11px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-default);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.primer-datatable tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-muted);
+  vertical-align: middle;
+  color: var(--fg-default);
+}
+
+.primer-datatable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.primer-datatable-row {
+  transition: background-color 0.1s ease;
+}
+
+.primer-datatable-row:hover {
+  background-color: var(--bg-canvas-subtle);
+}
+
+.primer-datatable-row-selected {
+  background-color: var(--selected-item-bg);
+}
+
+.primer-datatable-row-selected:hover {
+  background-color: var(--selected-item-bg);
+}
+
+.primer-datatable-group-row td {
+  background-color: var(--bg-canvas-subtle);
+  border-top: 1px solid var(--border-default);
+  border-bottom: 1px solid var(--border-default);
+  padding: 6px 12px;
+  font-weight: 600;
+}
+
+.primer-quota-meter {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background-color: var(--bg-canvas-inset);
+  border: 1px solid var(--border-muted);
+  overflow: hidden;
+}
+
+.primer-quota-meter-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.primer-action-menu-overlay,
+.primer-select-panel-overlay {
+  position: absolute;
+  z-index: 250;
+  min-width: 215px;
+  background-color: var(--bg-overlay);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  box-shadow: var(--overlay-shadow);
+  overflow: hidden;
+}
+
+.primer-select-panel-header {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-muted);
+  background-color: var(--bg-canvas-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.primer-action-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+}
+
+.primer-action-list-header {
+  padding: 5px 8px 3px 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+  user-select: none;
+}
+
+.primer-action-list-divider {
+  height: 1px;
+  margin: 4px -6px;
+  background-color: var(--border-muted);
+}
+
+.primer-action-list-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--fg-default);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.primer-action-list-item:hover:not(:disabled) {
+  background-color: var(--btn-bg-hover);
+}
+
+.primer-action-list-item-selected {
+  background-color: var(--selected-item-bg);
+  font-weight: 600;
+}
+
+.primer-action-list-item-danger {
+  color: var(--fg-danger);
+}
+
+.primer-action-list-item-danger:hover:not(:disabled) {
+  background-color: rgba(209, 36, 47, 0.12);
+}
+
+.primer-search-match-highlight {
+  background-color: rgba(210, 153, 34, 0.35);
+  color: var(--fg-default);
+  border-radius: 2px;
+  padding: 0 2px;
+  font-weight: 600;
+}
+
+.primer-banner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-canvas-subtle);
+  color: var(--fg-default);
+  flex-shrink: 0;
+}
+
+.primer-banner-warning {
+  border-color: var(--borderColor-attention-emphasis, var(--fg-attention));
+  background-color: var(--bgColor-attention-muted, rgba(210, 153, 34, 0.1));
+}
+
+.primer-banner-info {
+  border-color: var(--borderColor-accent-emphasis, var(--fg-accent));
+  background-color: var(--bgColor-accent-muted, var(--selected-item-bg));
+}
+
+.primer-banner-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.primer-banner-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg-attention);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.primer-banner-info .primer-banner-icon {
+  color: var(--fg-accent);
+}
+
+.primer-banner-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.primer-banner-title {
+  font-weight: 600;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--fg-default);
+}
+
+.primer-banner-description {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--fg-muted);
+}
+
+.primer-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  align-self: center;
+}
